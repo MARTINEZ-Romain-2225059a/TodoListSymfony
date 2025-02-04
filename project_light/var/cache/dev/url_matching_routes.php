@@ -19,7 +19,7 @@ return [
         '/register' => [[['_route' => 'app_register', '_controller' => 'App\\Controller\\RegistrationController::register'], null, null, null, false, false, null]],
         '/login' => [[['_route' => 'app_login', '_controller' => 'App\\Controller\\SecurityController::login'], null, null, null, false, false, null]],
         '/logout' => [[['_route' => 'app_logout', '_controller' => 'App\\Controller\\SecurityController::logout'], null, null, null, false, false, null]],
-        '/todo' => [[['_route' => 'app_todo_list', '_controller' => 'App\\Controller\\TodoListController::index'], null, null, null, false, false, null]],
+        '/' => [[['_route' => 'app_todo', '_controller' => 'App\\Controller\\TodoListController::index'], null, null, null, false, false, null]],
     ],
     [ // $regexpList
         0 => '{^(?'

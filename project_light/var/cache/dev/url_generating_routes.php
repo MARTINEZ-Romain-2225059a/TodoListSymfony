@@ -22,11 +22,11 @@ return [
     'app_register' => [[], ['_controller' => 'App\\Controller\\RegistrationController::register'], [], [['text', '/register']], [], [], []],
     'app_login' => [[], ['_controller' => 'App\\Controller\\SecurityController::login'], [], [['text', '/login']], [], [], []],
     'app_logout' => [[], ['_controller' => 'App\\Controller\\SecurityController::logout'], [], [['text', '/logout']], [], [], []],
-    'app_todo_list' => [[], ['_controller' => 'App\\Controller\\TodoListController::index'], [], [['text', '/todo']], [], [], []],
+    'app_todo' => [[], ['_controller' => 'App\\Controller\\TodoListController::index'], [], [['text', '/']], [], [], []],
     'App\Controller\ApiLoginController::index' => [[], ['_controller' => 'App\\Controller\\ApiLoginController::index'], [], [['text', '/api/login']], [], [], []],
     'App\Controller\LoginController::index' => [[], ['_controller' => 'App\\Controller\\SecurityController::login'], [], [['text', '/login']], [], [], []],
     'App\Controller\RegistrationController::register' => [[], ['_controller' => 'App\\Controller\\RegistrationController::register'], [], [['text', '/register']], [], [], []],
     'App\Controller\SecurityController::login' => [[], ['_controller' => 'App\\Controller\\SecurityController::login'], [], [['text', '/login']], [], [], []],
     'App\Controller\SecurityController::logout' => [[], ['_controller' => 'App\\Controller\\SecurityController::logout'], [], [['text', '/logout']], [], [], []],
-    'App\Controller\TodoListController::index' => [[], ['_controller' => 'App\\Controller\\TodoListController::index'], [], [['text', '/todo']], [], [], []],
+    'App\Controller\TodoListController::index' => [[], ['_controller' => 'App\\Controller\\TodoListController::index'], [], [['text', '/']], [], [], []],
 ];

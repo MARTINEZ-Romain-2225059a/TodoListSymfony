@@ -16,7 +16,7 @@ if (!\class_exists(App_KernelDevDebugContainer::class, false)) {
 
 return new \ContainerKlojmeh\App_KernelDevDebugContainer([
     'container.build_hash' => 'Klojmeh',
-    'container.build_id' => '7f8cd70e',
-    'container.build_time' => 1738683047,
+    'container.build_id' => '6f1ca674',
+    'container.build_time' => 1738686229,
     'container.runtime_mode' => \in_array(\PHP_SAPI, ['cli', 'phpdbg', 'embed'], true) ? 'web=0' : 'web=1',
 ], __DIR__.\DIRECTORY_SEPARATOR.'ContainerKlojmeh');
