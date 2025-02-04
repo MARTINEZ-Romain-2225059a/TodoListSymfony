@@ -10,6 +10,11 @@
     <option name="highlightLevel" value="WARNING" />
     <option name="transferred" value="true" />
   </component>
+  <component name="PhpCodeSniffer">
+    <phpcs_settings>
+      <phpcs_by_interpreter asDefaultInterpreter="true" interpreter_id="640124e7-470d-4fe0-bb82-c909b726ff9d" timeout="30000" />
+    </phpcs_settings>
+  </component>
   <component name="PhpIncludePathManager">
     <include_path>
       <path value="$PROJECT_DIR$/project_api/vendor/psr/link" />
@@ -197,9 +202,33 @@
       <path value="$PROJECT_DIR$/project_light/vendor/symfony/flex" />
       <path value="$PROJECT_DIR$/project_light/vendor/symfony/polyfill-intl-grapheme" />
       <path value="$PROJECT_DIR$/project_light/vendor/symfony/cache-contracts" />
+      <path value="$PROJECT_DIR$/project_light/vendor/psr/clock" />
+      <path value="$PROJECT_DIR$/project_light/vendor/symfony/type-info" />
+      <path value="$PROJECT_DIR$/project_light/vendor/symfony/security-bundle" />
+      <path value="$PROJECT_DIR$/project_light/vendor/symfony/property-info" />
+      <path value="$PROJECT_DIR$/project_light/vendor/symfony/property-access" />
+      <path value="$PROJECT_DIR$/project_light/vendor/symfony/clock" />
+      <path value="$PROJECT_DIR$/project_light/vendor/symfony/password-hasher" />
+      <path value="$PROJECT_DIR$/project_light/vendor/symfony/security-core" />
+      <path value="$PROJECT_DIR$/project_light/vendor/symfony/security-csrf" />
+      <path value="$PROJECT_DIR$/project_light/vendor/symfony/security-http" />
+      <path value="$PROJECT_DIR$/project_light/vendor/symfonycasts/verify-email-bundle" />
+      <path value="$PROJECT_DIR$/project_light/vendor/symfony/polyfill-intl-icu" />
+      <path value="$PROJECT_DIR$/project_light/vendor/symfony/validator" />
+      <path value="$PROJECT_DIR$/project_light/vendor/symfony/form" />
+      <path value="$PROJECT_DIR$/project_light/vendor/symfony/options-resolver" />
+      <path value="$PROJECT_DIR$/project_light/vendor/symfony/web-profiler-bundle" />
+      <path value="$PROJECT_DIR$/project_light/vendor/symfony/rate-limiter" />
+      <path value="$PROJECT_DIR$/project_light/vendor/symfony/webpack-encore-bundle" />
+      <path value="$PROJECT_DIR$/project_light/vendor/symfony/asset" />
     </include_path>
   </component>
   <component name="PhpProjectSharedConfiguration" php_language_level="8.2" />
+  <component name="PhpStan">
+    <PhpStan_settings>
+      <phpstan_by_interpreter asDefaultInterpreter="true" interpreter_id="640124e7-470d-4fe0-bb82-c909b726ff9d" timeout="60000" />
+    </PhpStan_settings>
+  </component>
   <component name="PhpStanOptionsConfiguration">
     <option name="transferred" value="true" />
   </component>
@@ -207,6 +236,11 @@
     <phpunit_settings>
       <PhpUnitSettings configuration_file_path="$PROJECT_DIR$/project_light/phpunit.xml.dist" custom_loader_path="$PROJECT_DIR$/project_light/vendor/autoload.php" use_configuration_file="true" />
     </phpunit_settings>
+  </component>
+  <component name="Psalm">
+    <Psalm_settings>
+      <psalm_fixer_by_interpreter asDefaultInterpreter="true" interpreter_id="640124e7-470d-4fe0-bb82-c909b726ff9d" timeout="60000" />
+    </Psalm_settings>
   </component>
   <component name="PsalmOptionsConfiguration">
     <option name="transferred" value="true" />
