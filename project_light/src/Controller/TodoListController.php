@@ -10,8 +10,10 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[Route('/', name: 'app_todo')]
+#[IsGranted('ROLE_USER')]
 class TodoListController extends AbstractController
 {
     #[Route('/', name: '_index', methods: ['GET'])]
