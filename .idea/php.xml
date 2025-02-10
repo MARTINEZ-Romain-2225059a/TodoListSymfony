@@ -221,6 +221,8 @@
       <path value="$PROJECT_DIR$/project_light/vendor/symfony/rate-limiter" />
       <path value="$PROJECT_DIR$/project_light/vendor/symfony/webpack-encore-bundle" />
       <path value="$PROJECT_DIR$/project_light/vendor/symfony/asset" />
+      <path value="$PROJECT_DIR$/project_light/vendor/symfony/http-client-contracts" />
+      <path value="$PROJECT_DIR$/project_light/vendor/symfony/http-client" />
     </include_path>
   </component>
   <component name="PhpProjectSharedConfiguration" php_language_level="8.2" />

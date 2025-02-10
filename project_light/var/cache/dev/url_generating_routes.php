@@ -22,7 +22,7 @@ return [
     'app_register' => [[], ['_controller' => 'App\\Controller\\RegistrationController::register'], [], [['text', '/register']], [], [], []],
     'app_login' => [[], ['_controller' => 'App\\Controller\\SecurityController::login'], [], [['text', '/login']], [], [], []],
     'app_logout' => [[], ['_controller' => 'App\\Controller\\SecurityController::logout'], [], [['text', '/logout']], [], [], []],
-    'app_todo_index' => [[], ['_controller' => 'App\\Controller\\TodoListController::index'], [], [['text', '/']], [], [], []],
+    'app_todo' => [[], ['_controller' => 'App\\Controller\\TodoListController::index'], [], [['text', '/']], [], [], []],
     'app_todo_new' => [[], ['_controller' => 'App\\Controller\\TodoListController::new'], [], [['text', '/new']], [], [], []],
     'app_todo_edit' => [['id'], ['_controller' => 'App\\Controller\\TodoListController::edit'], [], [['text', '/edit'], ['variable', '/', '[^/]++', 'id', true]], [], [], []],
     'app_todo_delete' => [['id'], ['_controller' => 'App\\Controller\\TodoListController::delete'], [], [['variable', '/', '[^/]++', 'id', true]], [], [], []],

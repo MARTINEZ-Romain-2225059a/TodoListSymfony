@@ -10,12 +10,23 @@ class AppFixtures extends Fixture
 {
     public function load(ObjectManager $manager): void
     {
+
+        $language = new Language();
+        $language->setName("FR");
+        $manager->persist($language);
         $language = new Language();
         $language->setName("EN");
-        $language->setName("FR");
+        $manager->persist($language);
+        $language = new Language();
         $language->setName("ES");
-        $language->setName("IT");
+        $manager->persist($language);
+        $language = new Language();
+        $language->setName("DK");
+        $manager->persist($language);
+        $language = new Language();
         $language->setName("JP");
+        $manager->persist($language);
+        $language = new Language();
         $language->setName("IT");
 
         $manager->persist($language);
