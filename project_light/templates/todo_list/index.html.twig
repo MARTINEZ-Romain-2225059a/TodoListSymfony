@@ -1,31 +1,58 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Hello TodoListController!{% endblock %}
+{% block title %}Todo List{% endblock %}
 
 {% block body %}
-    <style>
-        .example-wrapper { margin: 1em auto; max-width: 800px; width: 95%; font: 18px/1.5 sans-serif; }
-        .example-wrapper code { background: #F5F5F5; padding: 2px 6px; }
-    </style>
+    <div class="container mt-5">
+        <h1 class="text-center mb-4">📋 Ma To-Do List</h1>
 
-    <div class="example-wrapper">
-        <h1>Hello {{ controller_name }}! ✅</h1>
+        <!-- Bouton d'ajout -->
+        <div class="d-flex justify-content-between mb-3">
+            <a href="{{ path('app_todo_new') }}" class="btn btn-primary">
+                ➕ Ajouter une tâche
+            </a>
+            <form method="post" action="{{ path('app_logout') }}">
+                <button type="submit" class="btn btn-danger">🚪 Déconnexion</button>
+            </form>
+        </div>
 
-        <p>This friendly message is coming from:</p>
-        <ul>
-            <li>Your controller at <code>/home/romain/Bureau/Symfony/project_light/src/Controller/TodoListController.php</code></li>
-            <li>Your template at <code>/home/romain/Bureau/Symfony/project_light/templates/todo_list/index.html.twig</code></li>
-        </ul>
 
-        {# Ajout d'un lien de déconnexion si l'utilisateur est connecté #}
-        {% if app.user %}
-            <div class="mt-3">
-                <a href="{{ path('app_logout') }}" class="btn btn-danger">Se déconnecter</a>
+        <!-- Table des tâches -->
+        <div class="card shadow">
+            <div class="card-body">
+                <table class="table table-striped text-center">
+                    <thead class="table-dark">
+                    <tr>
+                        <th>Nom</th>
+                        <th>Date de début</th>
+                        <th>Date de fin</th>
+                        <th>Actions</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for todo in todos %}
+                        <tr>
+                            <td>{{ todo.name }}</td>
+                            <td>{{ todo.beginAt|date('d/m/Y H:i') }}</td>
+                            <td>{{ todo.endAt|date('d/m/Y H:i') }}</td>
+                            <td>
+                                <a href="{{ path('app_todo_edit', {'id': todo.id}) }}" class="btn btn-warning btn-sm">
+                                    ✏️ Modifier
+                                </a>
+                                <form method="post" action="{{ path('app_todo_delete', {'id': todo.id}) }}" class="d-inline" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cette tâche ?');">
+                                    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ todo.id) }}">
+                                    <button type="submit" class="btn btn-danger btn-sm">🗑 Supprimer</button>
+                                </form>
+                            </td>
+                        </tr>
+                    {% else %}
+                        <tr>
+                            <td colspan="4" class="text-muted">Aucune tâche pour le moment.</td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
             </div>
-        {% else %}
-            <div class="mt-3">
-                <p><a href="{{ path('app_login') }}" class="btn btn-primary">Se connecter</a></p>
-            </div>
-        {% endif %}
+        </div>
     </div>
 {% endblock %}

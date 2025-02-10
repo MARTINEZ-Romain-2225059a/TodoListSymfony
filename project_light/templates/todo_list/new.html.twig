@@ -1,0 +1,35 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Todo List New{% endblock %}
+
+{% block body %}
+    <div class="container mt-5">
+        <h1 class="text-center mb-4">➕ Ajouter une tâche</h1>
+
+        <div class="card shadow p-4">
+            {{ form_start(form, {'attr': {'class': 'needs-validation', 'novalidate': 'novalidate'}}) }}
+
+            <div class="mb-3">
+                {{ form_label(form.name, 'Nom de la tâche', {'label_attr': {'class': 'form-label'}}) }}
+                {{ form_widget(form.name, {'attr': {'class': 'form-control'}}) }}
+            </div>
+
+            <div class="mb-3">
+                {{ form_label(form.beginAt, 'Date de début', {'label_attr': {'class': 'form-label'}}) }}
+                {{ form_widget(form.beginAt, {'attr': {'class': 'form-control'}}) }}
+            </div>
+
+            <div class="mb-3">
+                {{ form_label(form.endAt, 'Date de fin', {'label_attr': {'class': 'form-label'}}) }}
+                {{ form_widget(form.endAt, {'attr': {'class': 'form-control'}}) }}
+            </div>
+
+            <div class="d-flex justify-content-between">
+                <a href="{{ path('app_todo_index') }}" class="btn btn-secondary">🔙 Retour</a>
+                <button type="submit" class="btn btn-success">💾 Enregistrer</button>
+            </div>
+
+            {{ form_end(form) }}
+        </div>
+    </div>
+{% endblock %}

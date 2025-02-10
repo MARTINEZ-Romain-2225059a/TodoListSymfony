@@ -17,10 +17,10 @@ class Todo
     private ?string $name = null;
 
     #[ORM\Column]
-    private ?\DateTimeImmutable $beginAt = null;
+    private ?\DateTime $beginAt = null;
 
     #[ORM\Column]
-    private ?\DateTimeImmutable $endAt = null;
+    private ?\DateTime $endAt = null;
 
     public function getId(): ?int
     {
@@ -39,24 +39,24 @@ class Todo
         return $this;
     }
 
-    public function getBeginAt(): ?\DateTimeImmutable
+    public function getBeginAt(): ?\DateTime
     {
         return $this->beginAt;
     }
 
-    public function setBeginAt(\DateTimeImmutable $beginAt): static
+    public function setBeginAt(\DateTime $beginAt): static
     {
         $this->beginAt = $beginAt;
 
         return $this;
     }
 
-    public function getEndAt(): ?\DateTimeImmutable
+    public function getEndAt(): ?\DateTime
     {
         return $this->endAt;
     }
 
-    public function setEndAt(\DateTimeImmutable $endAt): static
+    public function setEndAt(\DateTime $endAt): static
     {
         $this->endAt = $endAt;
 
