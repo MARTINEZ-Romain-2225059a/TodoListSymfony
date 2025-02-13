@@ -5,7 +5,6 @@
       <sourceFolder url="file://$MODULE_DIR$/project_api/src" isTestSource="false" packagePrefix="App\" />
       <sourceFolder url="file://$MODULE_DIR$/project_api/tests" isTestSource="true" packagePrefix="App\Tests\" />
       <sourceFolder url="file://$MODULE_DIR$/project_light/src" isTestSource="false" packagePrefix="App\" />
-      <sourceFolder url="file://$MODULE_DIR$/project_light/tests" isTestSource="true" />
       <sourceFolder url="file://$MODULE_DIR$/project_light/tests" isTestSource="true" packagePrefix="App\Tests\" />
       <excludeFolder url="file://$MODULE_DIR$/project_api/vendor/api-platform/doctrine-common" />
       <excludeFolder url="file://$MODULE_DIR$/project_api/vendor/api-platform/doctrine-orm" />
@@ -213,6 +212,7 @@
       <excludeFolder url="file://$MODULE_DIR$/project_light/vendor/symfonycasts/verify-email-bundle" />
       <excludeFolder url="file://$MODULE_DIR$/project_light/vendor/symfony/http-client" />
       <excludeFolder url="file://$MODULE_DIR$/project_light/vendor/symfony/http-client-contracts" />
+      <excludeFolder url="file://$MODULE_DIR$/project_light/vendor/symfony/translation" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />

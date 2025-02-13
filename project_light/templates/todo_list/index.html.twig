@@ -4,18 +4,18 @@
 
 {% block body %}
     <div class="container mt-5">
-        <h1 class="text-center mb-4">📋 Ma To-Do List</h1>
+        <h1 class="text-center mb-4">{{ 'todo_list.title'|trans }}</h1>
 
         <!-- Barre d'actions -->
         <div class="d-flex justify-content-between align-items-center mb-3">
             <!-- Bouton d'ajout -->
             <a href="{{ path('app_todo_new') }}" class="btn btn-primary">
-                ➕ Ajouter une tâche
+                {{ 'todo_list.add_task'|trans }}
             </a>
 
             <!-- Sélecteur de langue -->
             <form method="get" class="d-flex align-items-center">
-                <label for="languageSelect" class="me-2 fw-bold">🌍 Langue :</label>
+                <label for="languageSelect" class="me-2 fw-bold">{{ 'todo_list.language'|trans }}</label>
                 <select id="languageSelect" class="form-select form-select-sm w-auto" onchange="changeLanguage(this.value)">
                     {% for lang in languages %}
                         <option value="{{ lang.id }}" {% if lang.id == currentLanguage %}selected{% endif %}>
@@ -27,7 +27,7 @@
 
             <!-- Bouton de déconnexion -->
             <form method="post" action="{{ path('app_logout') }}">
-                <button type="submit" class="btn btn-danger">🚪 Déconnexion</button>
+                <button type="submit" class="btn btn-danger">{{ 'todo_list.logout'|trans }}</button>
             </form>
         </div>
 
@@ -44,10 +44,10 @@
                 <table class="table table-striped text-center">
                     <thead class="table-dark">
                     <tr>
-                        <th>Nom</th>
-                        <th>Date de début</th>
-                        <th>Date de fin</th>
-                        <th>Actions</th>
+                        <th>{{ 'table.name'|trans }}</th>
+                        <th>{{ 'table.start_date'|trans }}</th>
+                        <th>{{ 'table.end_date'|trans }}</th>
+                        <th>{{ 'table.actions'|trans }}</th>
                     </tr>
                     </thead>
                     <tbody>
@@ -58,22 +58,23 @@
                             <td>{{ todo.endAt|date('d/m/Y H:i') }}</td>
                             <td>
                                 <a href="{{ path('app_todo_edit', {'id': todo.id}) }}" class="btn btn-warning btn-sm">
-                                    ✏️ Modifier
+                                    ✏️ {{ 'table.edit'|trans }}
                                 </a>
-                                <form method="post" action="{{ path('app_todo_delete', {'id': todo.id}) }}" class="d-inline" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cette tâche ?');">
+                                <form method="post" action="{{ path('app_todo_delete', {'id': todo.id}) }}" class="d-inline"
+                                      onsubmit="return confirm('{{ 'table.confirm_delete'|trans }}');">
                                     <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ todo.id) }}">
-                                    <button type="submit" class="btn btn-danger btn-sm">🗑 Supprimer</button>
+                                    <button type="submit" class="btn btn-danger btn-sm">🗑 {{ 'table.delete'|trans }}</button>
                                 </form>
                             </td>
                         </tr>
                     {% else %}
                         <tr>
-                            <td colspan="4" class="text-muted">Aucune tâche pour le moment.</td>
+                            <td colspan="4" class="text-muted">{{ 'table.no_tasks'|trans }}</td>
                         </tr>
                     {% endfor %}
                     </tbody>
                 </table>
             </div>
         </div>
-    </div>
+
 {% endblock %}

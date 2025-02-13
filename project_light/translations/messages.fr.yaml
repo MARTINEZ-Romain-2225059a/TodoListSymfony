@@ -1,0 +1,23 @@
+todo_list:
+  title: "📋 Ma To-Do List"
+  add_task: "➕ Ajouter une tâche"
+  logout: "🚪 Déconnexion"
+  language: "🌍 Langue"
+
+table:
+  name: "Nom"
+  start_date: "Date de début"
+  end_date: "Date de fin"
+  actions: "Actions"
+  edit: "Modifier"
+  delete: "Supprimer"
+  confirm_delete: "Êtes-vous sûr de vouloir supprimer cette tâche ?"
+  no_tasks: "Aucune tâche pour le moment."
+
+todo_edit:
+  title: "Modifier la tâche"
+  task_name: "Nom de la tâche"
+  start_date: "Date de début"
+  end_date: "Date de fin"
+  back_button: "Retour"
+  save_button: "Enregistrer"

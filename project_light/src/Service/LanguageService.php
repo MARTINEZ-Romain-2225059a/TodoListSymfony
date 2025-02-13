@@ -18,8 +18,19 @@ class LanguageService
         $response = $this->httpClient->request('GET', 'http://127.0.0.1:8001/api/languages');
         $data = $response->toArray();
 
-        // Extraire uniquement la liste des langues sous la clé "member"
         return $data['member'] ?? [];
     }
 
+    public function getCodeById(int $id): string
+    {
+        $languages = $this->getLanguages();
+
+        foreach ($languages as $language) {
+            if ($language['id'] === $id) {
+                return strtolower($language['name']); // Convertit "FR" → "fr", "EN" → "en"
+            }
+        }
+
+        return 'fr'; // Par défaut en français si l'ID est inconnu
+    }
 }

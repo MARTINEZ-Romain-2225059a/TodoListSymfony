@@ -101,7 +101,7 @@
     <parameter key="kernel.http_method_override">false</parameter>
     <parameter key="kernel.trust_x_sendfile_type_header">%env(bool:default::SYMFONY_TRUST_X_SENDFILE_TYPE_HEADER)%</parameter>
     <parameter key="kernel.trusted_hosts">%env(default::SYMFONY_TRUSTED_HOSTS)%</parameter>
-    <parameter key="kernel.default_locale">en</parameter>
+    <parameter key="kernel.default_locale">fr</parameter>
     <parameter key="kernel.enabled_locales" type="collection"/>
     <parameter key="kernel.error_controller">error_controller</parameter>
     <parameter key="kernel.trusted_proxies">%env(default::SYMFONY_TRUSTED_PROXIES)%</parameter>
@@ -109,6 +109,8 @@
     <parameter key="debug.file_link_format">%env(default::SYMFONY_IDE)%</parameter>
     <parameter key="asset.request_context.base_path">null</parameter>
     <parameter key="asset.request_context.secure">null</parameter>
+    <parameter key="translator.logging">false</parameter>
+    <parameter key="translator.default_path">/home/romain/Bureau/Symfony/TodoListSymfony/project_light/translations</parameter>
     <parameter key="debug.error_handler.throw_at">-1</parameter>
     <parameter key="debug.container.dump">/home/romain/Bureau/Symfony/TodoListSymfony/project_light/var/cache/dev/App_KernelDevDebugContainer.xml</parameter>
     <parameter key="router.request_context.host">localhost</parameter>
@@ -272,6 +274,10 @@
         <parameter>cache</parameter>
         <parameter>@WebProfiler/Collector/cache.html.twig</parameter>
       </parameter>
+      <parameter key="data_collector.translation" type="collection">
+        <parameter>translation</parameter>
+        <parameter>@WebProfiler/Collector/translation.html.twig</parameter>
+      </parameter>
       <parameter key="data_collector.security" type="collection">
         <parameter>security</parameter>
         <parameter>@Security/Collector/security.html.twig</parameter>
@@ -382,7 +388,7 @@
     </service>
     <service id="argument_resolver.service" class="Symfony\Component\HttpKernel\Controller\ArgumentResolver\ServiceValueResolver">
       <tag priority="-50" name="Symfony\Component\HttpKernel\Controller\ArgumentResolver\ServiceValueResolver">controller.argument_value_resolver</tag>
-      <argument type="service" id=".service_locator.I4_FRn2"/>
+      <argument type="service" id=".service_locator.btbRW75"/>
     </service>
     <service id="argument_resolver.default" class="Symfony\Component\HttpKernel\Controller\ArgumentResolver\DefaultValueResolver">
       <tag priority="-100" name="Symfony\Component\HttpKernel\Controller\ArgumentResolver\DefaultValueResolver">controller.argument_value_resolver</tag>
@@ -405,7 +411,7 @@
       <tag name="container.hot_path"/>
       <tag name="container.hot_path"/>
       <argument type="service" id="request_stack"/>
-      <argument>en</argument>
+      <argument>fr</argument>
       <argument type="service" id="router.default" on-invalid="ignore"/>
       <argument>false</argument>
       <argument type="collection"/>
@@ -508,6 +514,7 @@
         <argument key="cache.property_info" type="service" id="cache.property_info" on-invalid="ignore_uninitialized"/>
         <argument key="http_client.transport" type="service" id="http_client.transport" on-invalid="ignore_uninitialized"/>
         <argument key="http_client" type="service" id=".debug.http_client" on-invalid="ignore_uninitialized"/>
+        <argument key="translation.locale_switcher" type="service" id="translation.locale_switcher" on-invalid="ignore_uninitialized"/>
         <argument key="debug.stopwatch" type="service" id="debug.stopwatch" on-invalid="ignore_uninitialized"/>
         <argument key="debug.event_dispatcher" type="service" id="debug.event_dispatcher" on-invalid="ignore_uninitialized"/>
         <argument key="cache.rate_limiter" type="service" id="cache.rate_limiter" on-invalid="ignore_uninitialized"/>
@@ -560,6 +567,9 @@
         </argument>
         <argument key="http_client" type="collection">
           <argument>?reset</argument>
+        </argument>
+        <argument key="translation.locale_switcher" type="collection">
+          <argument>reset</argument>
         </argument>
         <argument key="debug.stopwatch" type="collection">
           <argument>reset</argument>
@@ -646,6 +656,8 @@
       <tag name="container.hot_path"/>
       <argument type="iterator">
         <argument type="service" id="slugger"/>
+        <argument type="service" id="translator.default"/>
+        <argument type="service" id="translation.locale_switcher"/>
       </argument>
       <argument type="service" id="request_stack"/>
     </service>
@@ -657,7 +669,7 @@
     </service>
     <service id="slugger" class="Symfony\Component\String\Slugger\AsciiSlugger">
       <tag name="kernel.locale_aware"/>
-      <argument>en</argument>
+      <argument>fr</argument>
     </service>
     <service id="container.getenv" class="Closure">
       <tag name="routing.expression_language_function" function="env"/>
@@ -989,6 +1001,57 @@
         <argument>Help debug routes by simulating a path info match</argument>
       </call>
     </service>
+    <service id="console.command.translation_debug" class="Symfony\Bundle\FrameworkBundle\Command\TranslationDebugCommand">
+      <tag name="console.command"/>
+      <tag name="container.no_preload"/>
+      <argument type="service" id="translator.data_collector"/>
+      <argument type="service" id="translation.reader"/>
+      <argument type="service" id="translation.extractor"/>
+      <argument>/home/romain/Bureau/Symfony/TodoListSymfony/project_light/translations</argument>
+      <argument>/home/romain/Bureau/Symfony/TodoListSymfony/project_light/templates</argument>
+      <argument type="collection">
+        <argument>/home/romain/Bureau/Symfony/TodoListSymfony/project_light/vendor/symfony/validator/Resources/translations</argument>
+        <argument>/home/romain/Bureau/Symfony/TodoListSymfony/project_light/vendor/symfony/form/Resources/translations</argument>
+        <argument>/home/romain/Bureau/Symfony/TodoListSymfony/project_light/vendor/symfony/security-core/Resources/translations</argument>
+        <argument>/home/romain/Bureau/Symfony/TodoListSymfony/project_light/vendor/symfonycasts/verify-email-bundle/src/Resources/translations</argument>
+      </argument>
+      <argument type="collection">
+        <argument>/home/romain/Bureau/Symfony/TodoListSymfony/project_light/vendor/symfony/twig-bridge/Resources/views/Form</argument>
+      </argument>
+      <argument type="collection"/>
+      <call method="setName">
+        <argument>debug:translation</argument>
+      </call>
+      <call method="setDescription">
+        <argument>Display translation messages information</argument>
+      </call>
+    </service>
+    <service id="console.command.translation_extract" class="Symfony\Bundle\FrameworkBundle\Command\TranslationUpdateCommand">
+      <tag name="console.command"/>
+      <tag name="container.no_preload"/>
+      <argument type="service" id="translation.writer"/>
+      <argument type="service" id="translation.reader"/>
+      <argument type="service" id="translation.extractor"/>
+      <argument>fr</argument>
+      <argument>/home/romain/Bureau/Symfony/TodoListSymfony/project_light/translations</argument>
+      <argument>/home/romain/Bureau/Symfony/TodoListSymfony/project_light/templates</argument>
+      <argument type="collection">
+        <argument>/home/romain/Bureau/Symfony/TodoListSymfony/project_light/vendor/symfony/validator/Resources/translations</argument>
+        <argument>/home/romain/Bureau/Symfony/TodoListSymfony/project_light/vendor/symfony/form/Resources/translations</argument>
+        <argument>/home/romain/Bureau/Symfony/TodoListSymfony/project_light/vendor/symfony/security-core/Resources/translations</argument>
+        <argument>/home/romain/Bureau/Symfony/TodoListSymfony/project_light/vendor/symfonycasts/verify-email-bundle/src/Resources/translations</argument>
+      </argument>
+      <argument type="collection">
+        <argument>/home/romain/Bureau/Symfony/TodoListSymfony/project_light/vendor/symfony/twig-bridge/Resources/views/Form</argument>
+      </argument>
+      <argument type="collection"/>
+      <call method="setName">
+        <argument>translation:extract</argument>
+      </call>
+      <call method="setDescription">
+        <argument>Extract missing translations keys from code to translation files</argument>
+      </call>
+    </service>
     <service id="console.command.validator_debug" class="Symfony\Component\Validator\Command\DebugCommand">
       <tag name="console.command"/>
       <tag name="container.no_preload"/>
@@ -1000,6 +1063,46 @@
         <argument>Display validation constraints for classes</argument>
       </call>
     </service>
+    <service id="console.command.translation_pull" class="Symfony\Component\Translation\Command\TranslationPullCommand">
+      <tag name="console.command" command="translation:pull"/>
+      <tag name="container.no_preload"/>
+      <argument type="service" id="translation.provider_collection"/>
+      <argument type="service" id="translation.writer"/>
+      <argument type="service" id="translation.reader"/>
+      <argument>fr</argument>
+      <argument type="collection"/>
+      <argument type="collection"/>
+      <call method="setName">
+        <argument>translation:pull</argument>
+      </call>
+      <call method="setDescription">
+        <argument>Pull translations from a given provider.</argument>
+      </call>
+    </service>
+    <service id="console.command.translation_push" class="Symfony\Component\Translation\Command\TranslationPushCommand">
+      <tag name="console.command" command="translation:push"/>
+      <tag name="container.no_preload"/>
+      <argument type="service" id="translation.provider_collection"/>
+      <argument type="service" id="translation.reader"/>
+      <argument type="collection"/>
+      <argument type="collection"/>
+      <call method="setName">
+        <argument>translation:push</argument>
+      </call>
+      <call method="setDescription">
+        <argument>Push translations to a given provider.</argument>
+      </call>
+    </service>
+    <service id="console.command.xliff_lint" class="Symfony\Component\Translation\Command\XliffLintCommand">
+      <tag name="console.command"/>
+      <tag name="container.no_preload"/>
+      <call method="setName">
+        <argument>lint:xliff</argument>
+      </call>
+      <call method="setDescription">
+        <argument>Lint an XLIFF file and outputs encountered errors</argument>
+      </call>
+    </service>
     <service id="console.command.yaml_lint" class="Symfony\Bundle\FrameworkBundle\Command\YamlLintCommand">
       <tag name="console.command"/>
       <tag name="container.no_preload"/>
@@ -1008,6 +1111,18 @@
       </call>
       <call method="setDescription">
         <argument>Lint a YAML file and outputs encountered errors</argument>
+      </call>
+    </service>
+    <service id="console.command.translation_lint" class="Symfony\Component\Translation\Command\TranslationLintCommand">
+      <tag name="console.command"/>
+      <tag name="container.no_preload"/>
+      <argument type="service" id="translator.data_collector"/>
+      <argument type="collection"/>
+      <call method="setName">
+        <argument>lint:translations</argument>
+      </call>
+      <call method="setDescription">
+        <argument>Lint translations files syntax and outputs encountered errors</argument>
       </call>
     </service>
     <service id="console.command.form_debug" class="Symfony\Component\Form\Command\DebugCommand">
@@ -1034,6 +1149,7 @@
         <argument>Symfony\Component\Form\Extension\Validator\Type\FormTypeValidatorExtension</argument>
         <argument>Symfony\Component\Form\Extension\Validator\Type\RepeatedTypeValidatorExtension</argument>
         <argument>Symfony\Component\Form\Extension\Validator\Type\SubmitTypeValidatorExtension</argument>
+        <argument>Symfony\Component\Form\Extension\Validator\Type\UploadValidatorExtension</argument>
         <argument>Symfony\Component\Form\Extension\Csrf\Type\FormTypeCsrfExtension</argument>
         <argument>Symfony\Component\Form\Extension\DataCollector\Type\DataCollectorTypeExtension</argument>
         <argument>Symfony\Component\Form\Extension\PasswordHasher\Type\FormTypePasswordHasherExtension</argument>
@@ -1319,6 +1435,7 @@
         <argument key="cache.webpack_encore" type="service" id="cache.webpack_encore" on-invalid="ignore_uninitialized"/>
       </argument>
     </service>
+    <service id="identity_translator" class="Symfony\Component\Translation\IdentityTranslator"/>
     <service id="assets.packages" class="Symfony\Component\Asset\Packages">
       <argument type="service" id="assets._default_package"/>
       <argument type="tagged_iterator" tag="assets.package" index-by="package" default-index-method="getDefaultPackageName" default-priority-method="getDefaultPackagePriority"/>
@@ -1410,6 +1527,719 @@
     <service id="http_client.messenger.ping_webhook_handler" class="Symfony\Component\HttpClient\Messenger\PingWebhookMessageHandler">
       <tag name="messenger.message_handler"/>
       <argument type="service" id=".debug.http_client"/>
+    </service>
+    <service id="translator.default" class="Symfony\Bundle\FrameworkBundle\Translation\Translator">
+      <tag name="kernel.locale_aware"/>
+      <argument type="service" id=".service_locator.ILdUWIS"/>
+      <argument type="service" id="translator.formatter.default"/>
+      <argument>fr</argument>
+      <argument type="collection">
+        <argument key="translation.loader.php" type="collection">
+          <argument>php</argument>
+        </argument>
+        <argument key="translation.loader.yml" type="collection">
+          <argument>yaml</argument>
+          <argument>yml</argument>
+        </argument>
+        <argument key="translation.loader.xliff" type="collection">
+          <argument>xlf</argument>
+          <argument>xliff</argument>
+        </argument>
+        <argument key="translation.loader.po" type="collection">
+          <argument>po</argument>
+        </argument>
+        <argument key="translation.loader.mo" type="collection">
+          <argument>mo</argument>
+        </argument>
+        <argument key="translation.loader.qt" type="collection">
+          <argument>ts</argument>
+        </argument>
+        <argument key="translation.loader.csv" type="collection">
+          <argument>csv</argument>
+        </argument>
+        <argument key="translation.loader.res" type="collection">
+          <argument>res</argument>
+        </argument>
+        <argument key="translation.loader.dat" type="collection">
+          <argument>dat</argument>
+        </argument>
+        <argument key="translation.loader.ini" type="collection">
+          <argument>ini</argument>
+        </argument>
+        <argument key="translation.loader.json" type="collection">
+          <argument>json</argument>
+        </argument>
+      </argument>
+      <argument type="collection">
+        <argument key="cache_dir">/home/romain/Bureau/Symfony/TodoListSymfony/project_light/var/cache/dev/translations</argument>
+        <argument key="debug">true</argument>
+        <argument key="resource_files" type="collection">
+          <argument key="af" type="collection">
+            <argument>/home/romain/Bureau/Symfony/TodoListSymfony/project_light/vendor/symfony/validator/Resources/translations/validators.af.xlf</argument>
+            <argument>/home/romain/Bureau/Symfony/TodoListSymfony/project_light/vendor/symfony/form/Resources/translations/validators.af.xlf</argument>
+            <argument>/home/romain/Bureau/Symfony/TodoListSymfony/project_light/vendor/symfony/security-core/Resources/translations/security.af.xlf</argument>
+          </argument>
+          <argument key="ar" type="collection">
+            <argument>/home/romain/Bureau/Symfony/TodoListSymfony/project_light/vendor/symfony/validator/Resources/translations/validators.ar.xlf</argument>
+            <argument>/home/romain/Bureau/Symfony/TodoListSymfony/project_light/vendor/symfony/form/Resources/translations/validators.ar.xlf</argument>
+            <argument>/home/romain/Bureau/Symfony/TodoListSymfony/project_light/vendor/symfony/security-core/Resources/translations/security.ar.xlf</argument>
+            <argument>/home/romain/Bureau/Symfony/TodoListSymfony/project_light/vendor/symfonycasts/verify-email-bundle/src/Resources/translations/VerifyEmailBundle.ar.xlf</argument>
+          </argument>
+          <argument key="az" type="collection">
+            <argument>/home/romain/Bureau/Symfony/TodoListSymfony/project_light/vendor/symfony/validator/Resources/translations/validators.az.xlf</argument>
+            <argument>/home/romain/Bureau/Symfony/TodoListSymfony/project_light/vendor/symfony/form/Resources/translations/validators.az.xlf</argument>
+            <argument>/home/romain/Bureau/Symfony/TodoListSymfony/project_light/vendor/symfony/security-core/Resources/translations/security.az.xlf</argument>
+          </argument>
+          <argument key="be" type="collection">
+            <argument>/home/romain/Bureau/Symfony/TodoListSymfony/project_light/vendor/symfony/validator/Resources/translations/validators.be.xlf</argument>
+            <argument>/home/romain/Bureau/Symfony/TodoListSymfony/project_light/vendor/symfony/form/Resources/translations/validators.be.xlf</argument>
+            <argument>/home/romain/Bureau/Symfony/TodoListSymfony/project_light/vendor/symfony/security-core/Resources/translations/security.be.xlf</argument>
+          </argument>
+          <argument key="bg" type="collection">
+            <argument>/home/romain/Bureau/Symfony/TodoListSymfony/project_light/vendor/symfony/validator/Resources/translations/validators.bg.xlf</argument>
+            <argument>/home/romain/Bureau/Symfony/TodoListSymfony/project_light/vendor/symfony/form/Resources/translations/validators.bg.xlf</argument>
+            <argument>/home/romain/Bureau/Symfony/TodoListSymfony/project_light/vendor/symfony/security-core/Resources/translations/security.bg.xlf</argument>
+          </argument>
+          <argument key="bs" type="collection">
+            <argument>/home/romain/Bureau/Symfony/TodoListSymfony/project_light/vendor/symfony/validator/Resources/translations/validators.bs.xlf</argument>
+            <argument>/home/romain/Bureau/Symfony/TodoListSymfony/project_light/vendor/symfony/form/Resources/translations/validators.bs.xlf</argument>
+            <argument>/home/romain/Bureau/Symfony/TodoListSymfony/project_light/vendor/symfony/security-core/Resources/translations/security.bs.xlf</argument>
+          </argument>
+          <argument key="ca" type="collection">
+            <argument>/home/romain/Bureau/Symfony/TodoListSymfony/project_light/vendor/symfony/validator/Resources/translations/validators.ca.xlf</argument>
+            <argument>/home/romain/Bureau/Symfony/TodoListSymfony/project_light/vendor/symfony/form/Resources/translations/validators.ca.xlf</argument>
+            <argument>/home/romain/Bureau/Symfony/TodoListSymfony/project_light/vendor/symfony/security-core/Resources/translations/security.ca.xlf</argument>
+            <argument>/home/romain/Bureau/Symfony/TodoListSymfony/project_light/vendor/symfonycasts/verify-email-bundle/src/Resources/translations/VerifyEmailBundle.ca.xlf</argument>
+          </argument>
+          <argument key="cs" type="collection">
+            <argument>/home/romain/Bureau/Symfony/TodoListSymfony/project_light/vendor/symfony/validator/Resources/translations/validators.cs.xlf</argument>
+            <argument>/home/romain/Bureau/Symfony/TodoListSymfony/project_light/vendor/symfony/form/Resources/translations/validators.cs.xlf</argument>
+            <argument>/home/romain/Bureau/Symfony/TodoListSymfony/project_light/vendor/symfony/security-core/Resources/translations/security.cs.xlf</argument>
+            <argument>/home/romain/Bureau/Symfony/TodoListSymfony/project_light/vendor/symfonycasts/verify-email-bundle/src/Resources/translations/VerifyEmailBundle.cs.xlf</argument>
+          </argument>
+          <argument key="cy" type="collection">
+            <argument>/home/romain/Bureau/Symfony/TodoListSymfony/project_light/vendor/symfony/validator/Resources/translations/validators.cy.xlf</argument>
+            <argument>/home/romain/Bureau/Symfony/TodoListSymfony/project_light/vendor/symfony/form/Resources/translations/validators.cy.xlf</argument>
+            <argument>/home/romain/Bureau/Symfony/TodoListSymfony/project_light/vendor/symfony/security-core/Resources/translations/security.cy.xlf</argument>
+          </argument>
+          <argument key="da" type="collection">
+            <argument>/home/romain/Bureau/Symfony/TodoListSymfony/project_light/vendor/symfony/validator/Resources/translations/validators.da.xlf</argument>
+            <argument>/home/romain/Bureau/Symfony/TodoListSymfony/project_light/vendor/symfony/form/Resources/translations/validators.da.xlf</argument>
+            <argument>/home/romain/Bureau/Symfony/TodoListSymfony/project_light/vendor/symfony/security-core/Resources/translations/security.da.xlf</argument>
+            <argument>/home/romain/Bureau/Symfony/TodoListSymfony/project_light/vendor/symfonycasts/verify-email-bundle/src/Resources/translations/VerifyEmailBundle.da.xlf</argument>
+          </argument>
+          <argument key="de" type="collection">
+            <argument>/home/romain/Bureau/Symfony/TodoListSymfony/project_light/vendor/symfony/validator/Resources/translations/validators.de.xlf</argument>
+            <argument>/home/romain/Bureau/Symfony/TodoListSymfony/project_light/vendor/symfony/form/Resources/translations/validators.de.xlf</argument>
+            <argument>/home/romain/Bureau/Symfony/TodoListSymfony/project_light/vendor/symfony/security-core/Resources/translations/security.de.xlf</argument>
+            <argument>/home/romain/Bureau/Symfony/TodoListSymfony/project_light/vendor/symfonycasts/verify-email-bundle/src/Resources/translations/VerifyEmailBundle.de.xlf</argument>
+          </argument>
+          <argument key="el" type="collection">
+            <argument>/home/romain/Bureau/Symfony/TodoListSymfony/project_light/vendor/symfony/validator/Resources/translations/validators.el.xlf</argument>
+            <argument>/home/romain/Bureau/Symfony/TodoListSymfony/project_light/vendor/symfony/form/Resources/translations/validators.el.xlf</argument>
+            <argument>/home/romain/Bureau/Symfony/TodoListSymfony/project_light/vendor/symfony/security-core/Resources/translations/security.el.xlf</argument>
+            <argument>/home/romain/Bureau/Symfony/TodoListSymfony/project_light/vendor/symfonycasts/verify-email-bundle/src/Resources/translations/VerifyEmailBundle.el.xlf</argument>
+          </argument>
+          <argument key="en" type="collection">
+            <argument>/home/romain/Bureau/Symfony/TodoListSymfony/project_light/vendor/symfony/validator/Resources/translations/validators.en.xlf</argument>
+            <argument>/home/romain/Bureau/Symfony/TodoListSymfony/project_light/vendor/symfony/form/Resources/translations/validators.en.xlf</argument>
+            <argument>/home/romain/Bureau/Symfony/TodoListSymfony/project_light/vendor/symfony/security-core/Resources/translations/security.en.xlf</argument>
+            <argument>/home/romain/Bureau/Symfony/TodoListSymfony/project_light/vendor/symfonycasts/verify-email-bundle/src/Resources/translations/VerifyEmailBundle.en.xlf</argument>
+            <argument>/home/romain/Bureau/Symfony/TodoListSymfony/project_light/translations/messages.en.yaml</argument>
+          </argument>
+          <argument key="es" type="collection">
+            <argument>/home/romain/Bureau/Symfony/TodoListSymfony/project_light/vendor/symfony/validator/Resources/translations/validators.es.xlf</argument>
+            <argument>/home/romain/Bureau/Symfony/TodoListSymfony/project_light/vendor/symfony/form/Resources/translations/validators.es.xlf</argument>
+            <argument>/home/romain/Bureau/Symfony/TodoListSymfony/project_light/vendor/symfony/security-core/Resources/translations/security.es.xlf</argument>
+            <argument>/home/romain/Bureau/Symfony/TodoListSymfony/project_light/vendor/symfonycasts/verify-email-bundle/src/Resources/translations/VerifyEmailBundle.es.xlf</argument>
+          </argument>
+          <argument key="et" type="collection">
+            <argument>/home/romain/Bureau/Symfony/TodoListSymfony/project_light/vendor/symfony/validator/Resources/translations/validators.et.xlf</argument>
+            <argument>/home/romain/Bureau/Symfony/TodoListSymfony/project_light/vendor/symfony/form/Resources/translations/validators.et.xlf</argument>
+            <argument>/home/romain/Bureau/Symfony/TodoListSymfony/project_light/vendor/symfony/security-core/Resources/translations/security.et.xlf</argument>
+          </argument>
+          <argument key="eu" type="collection">
+            <argument>/home/romain/Bureau/Symfony/TodoListSymfony/project_light/vendor/symfony/validator/Resources/translations/validators.eu.xlf</argument>
+            <argument>/home/romain/Bureau/Symfony/TodoListSymfony/project_light/vendor/symfony/form/Resources/translations/validators.eu.xlf</argument>
+            <argument>/home/romain/Bureau/Symfony/TodoListSymfony/project_light/vendor/symfony/security-core/Resources/translations/security.eu.xlf</argument>
+          </argument>
+          <argument key="fa" type="collection">
+            <argument>/home/romain/Bureau/Symfony/TodoListSymfony/project_light/vendor/symfony/validator/Resources/translations/validators.fa.xlf</argument>
+            <argument>/home/romain/Bureau/Symfony/TodoListSymfony/project_light/vendor/symfony/form/Resources/translations/validators.fa.xlf</argument>
+            <argument>/home/romain/Bureau/Symfony/TodoListSymfony/project_light/vendor/symfony/security-core/Resources/translations/security.fa.xlf</argument>
+            <argument>/home/romain/Bureau/Symfony/TodoListSymfony/project_light/vendor/symfonycasts/verify-email-bundle/src/Resources/translations/VerifyEmailBundle.fa.xlf</argument>
+          </argument>
+          <argument key="fi" type="collection">
+            <argument>/home/romain/Bureau/Symfony/TodoListSymfony/project_light/vendor/symfony/validator/Resources/translations/validators.fi.xlf</argument>
+            <argument>/home/romain/Bureau/Symfony/TodoListSymfony/project_light/vendor/symfony/form/Resources/translations/validators.fi.xlf</argument>
+            <argument>/home/romain/Bureau/Symfony/TodoListSymfony/project_light/vendor/symfony/security-core/Resources/translations/security.fi.xlf</argument>
+            <argument>/home/romain/Bureau/Symfony/TodoListSymfony/project_light/vendor/symfonycasts/verify-email-bundle/src/Resources/translations/VerifyEmailBundle.fi.xlf</argument>
+          </argument>
+          <argument key="fr" type="collection">
+            <argument>/home/romain/Bureau/Symfony/TodoListSymfony/project_light/vendor/symfony/validator/Resources/translations/validators.fr.xlf</argument>
+            <argument>/home/romain/Bureau/Symfony/TodoListSymfony/project_light/vendor/symfony/form/Resources/translations/validators.fr.xlf</argument>
+            <argument>/home/romain/Bureau/Symfony/TodoListSymfony/project_light/vendor/symfony/security-core/Resources/translations/security.fr.xlf</argument>
+            <argument>/home/romain/Bureau/Symfony/TodoListSymfony/project_light/vendor/symfonycasts/verify-email-bundle/src/Resources/translations/VerifyEmailBundle.fr.xlf</argument>
+            <argument>/home/romain/Bureau/Symfony/TodoListSymfony/project_light/translations/messages.fr.yaml</argument>
+          </argument>
+          <argument key="gl" type="collection">
+            <argument>/home/romain/Bureau/Symfony/TodoListSymfony/project_light/vendor/symfony/validator/Resources/translations/validators.gl.xlf</argument>
+            <argument>/home/romain/Bureau/Symfony/TodoListSymfony/project_light/vendor/symfony/form/Resources/translations/validators.gl.xlf</argument>
+            <argument>/home/romain/Bureau/Symfony/TodoListSymfony/project_light/vendor/symfony/security-core/Resources/translations/security.gl.xlf</argument>
+          </argument>
+          <argument key="he" type="collection">
+            <argument>/home/romain/Bureau/Symfony/TodoListSymfony/project_light/vendor/symfony/validator/Resources/translations/validators.he.xlf</argument>
+            <argument>/home/romain/Bureau/Symfony/TodoListSymfony/project_light/vendor/symfony/form/Resources/translations/validators.he.xlf</argument>
+            <argument>/home/romain/Bureau/Symfony/TodoListSymfony/project_light/vendor/symfony/security-core/Resources/translations/security.he.xlf</argument>
+          </argument>
+          <argument key="hr" type="collection">
+            <argument>/home/romain/Bureau/Symfony/TodoListSymfony/project_light/vendor/symfony/validator/Resources/translations/validators.hr.xlf</argument>
+            <argument>/home/romain/Bureau/Symfony/TodoListSymfony/project_light/vendor/symfony/form/Resources/translations/validators.hr.xlf</argument>
+            <argument>/home/romain/Bureau/Symfony/TodoListSymfony/project_light/vendor/symfony/security-core/Resources/translations/security.hr.xlf</argument>
+          </argument>
+          <argument key="hu" type="collection">
+            <argument>/home/romain/Bureau/Symfony/TodoListSymfony/project_light/vendor/symfony/validator/Resources/translations/validators.hu.xlf</argument>
+            <argument>/home/romain/Bureau/Symfony/TodoListSymfony/project_light/vendor/symfony/form/Resources/translations/validators.hu.xlf</argument>
+            <argument>/home/romain/Bureau/Symfony/TodoListSymfony/project_light/vendor/symfony/security-core/Resources/translations/security.hu.xlf</argument>
+            <argument>/home/romain/Bureau/Symfony/TodoListSymfony/project_light/vendor/symfonycasts/verify-email-bundle/src/Resources/translations/VerifyEmailBundle.hu.xlf</argument>
+          </argument>
+          <argument key="hy" type="collection">
+            <argument>/home/romain/Bureau/Symfony/TodoListSymfony/project_light/vendor/symfony/validator/Resources/translations/validators.hy.xlf</argument>
+            <argument>/home/romain/Bureau/Symfony/TodoListSymfony/project_light/vendor/symfony/form/Resources/translations/validators.hy.xlf</argument>
+            <argument>/home/romain/Bureau/Symfony/TodoListSymfony/project_light/vendor/symfony/security-core/Resources/translations/security.hy.xlf</argument>
+          </argument>
+          <argument key="id" type="collection">
+            <argument>/home/romain/Bureau/Symfony/TodoListSymfony/project_light/vendor/symfony/validator/Resources/translations/validators.id.xlf</argument>
+            <argument>/home/romain/Bureau/Symfony/TodoListSymfony/project_light/vendor/symfony/form/Resources/translations/validators.id.xlf</argument>
+            <argument>/home/romain/Bureau/Symfony/TodoListSymfony/project_light/vendor/symfony/security-core/Resources/translations/security.id.xlf</argument>
+            <argument>/home/romain/Bureau/Symfony/TodoListSymfony/project_light/vendor/symfonycasts/verify-email-bundle/src/Resources/translations/VerifyEmailBundle.id.xlf</argument>
+          </argument>
+          <argument key="it" type="collection">
+            <argument>/home/romain/Bureau/Symfony/TodoListSymfony/project_light/vendor/symfony/validator/Resources/translations/validators.it.xlf</argument>
+            <argument>/home/romain/Bureau/Symfony/TodoListSymfony/project_light/vendor/symfony/form/Resources/translations/validators.it.xlf</argument>
+            <argument>/home/romain/Bureau/Symfony/TodoListSymfony/project_light/vendor/symfony/security-core/Resources/translations/security.it.xlf</argument>
+            <argument>/home/romain/Bureau/Symfony/TodoListSymfony/project_light/vendor/symfonycasts/verify-email-bundle/src/Resources/translations/VerifyEmailBundle.it.xlf</argument>
+          </argument>
+          <argument key="ja" type="collection">
+            <argument>/home/romain/Bureau/Symfony/TodoListSymfony/project_light/vendor/symfony/validator/Resources/translations/validators.ja.xlf</argument>
+            <argument>/home/romain/Bureau/Symfony/TodoListSymfony/project_light/vendor/symfony/form/Resources/translations/validators.ja.xlf</argument>
+            <argument>/home/romain/Bureau/Symfony/TodoListSymfony/project_light/vendor/symfony/security-core/Resources/translations/security.ja.xlf</argument>
+            <argument>/home/romain/Bureau/Symfony/TodoListSymfony/project_light/vendor/symfonycasts/verify-email-bundle/src/Resources/translations/VerifyEmailBundle.ja.xlf</argument>
+          </argument>
+          <argument key="lb" type="collection">
+            <argument>/home/romain/Bureau/Symfony/TodoListSymfony/project_light/vendor/symfony/validator/Resources/translations/validators.lb.xlf</argument>
+            <argument>/home/romain/Bureau/Symfony/TodoListSymfony/project_light/vendor/symfony/form/Resources/translations/validators.lb.xlf</argument>
+            <argument>/home/romain/Bureau/Symfony/TodoListSymfony/project_light/vendor/symfony/security-core/Resources/translations/security.lb.xlf</argument>
+          </argument>
+          <argument key="lt" type="collection">
+            <argument>/home/romain/Bureau/Symfony/TodoListSymfony/project_light/vendor/symfony/validator/Resources/translations/validators.lt.xlf</argument>
+            <argument>/home/romain/Bureau/Symfony/TodoListSymfony/project_light/vendor/symfony/form/Resources/translations/validators.lt.xlf</argument>
+            <argument>/home/romain/Bureau/Symfony/TodoListSymfony/project_light/vendor/symfony/security-core/Resources/translations/security.lt.xlf</argument>
+          </argument>
+          <argument key="lv" type="collection">
+            <argument>/home/romain/Bureau/Symfony/TodoListSymfony/project_light/vendor/symfony/validator/Resources/translations/validators.lv.xlf</argument>
+            <argument>/home/romain/Bureau/Symfony/TodoListSymfony/project_light/vendor/symfony/form/Resources/translations/validators.lv.xlf</argument>
+            <argument>/home/romain/Bureau/Symfony/TodoListSymfony/project_light/vendor/symfony/security-core/Resources/translations/security.lv.xlf</argument>
+          </argument>
+          <argument key="mk" type="collection">
+            <argument>/home/romain/Bureau/Symfony/TodoListSymfony/project_light/vendor/symfony/validator/Resources/translations/validators.mk.xlf</argument>
+            <argument>/home/romain/Bureau/Symfony/TodoListSymfony/project_light/vendor/symfony/form/Resources/translations/validators.mk.xlf</argument>
+            <argument>/home/romain/Bureau/Symfony/TodoListSymfony/project_light/vendor/symfony/security-core/Resources/translations/security.mk.xlf</argument>
+            <argument>/home/romain/Bureau/Symfony/TodoListSymfony/project_light/vendor/symfonycasts/verify-email-bundle/src/Resources/translations/VerifyEmailBundle.mk.xlf</argument>
+          </argument>
+          <argument key="mn" type="collection">
+            <argument>/home/romain/Bureau/Symfony/TodoListSymfony/project_light/vendor/symfony/validator/Resources/translations/validators.mn.xlf</argument>
+            <argument>/home/romain/Bureau/Symfony/TodoListSymfony/project_light/vendor/symfony/form/Resources/translations/validators.mn.xlf</argument>
+            <argument>/home/romain/Bureau/Symfony/TodoListSymfony/project_light/vendor/symfony/security-core/Resources/translations/security.mn.xlf</argument>
+            <argument>/home/romain/Bureau/Symfony/TodoListSymfony/project_light/vendor/symfonycasts/verify-email-bundle/src/Resources/translations/VerifyEmailBundle.mn.xlf</argument>
+          </argument>
+          <argument key="my" type="collection">
+            <argument>/home/romain/Bureau/Symfony/TodoListSymfony/project_light/vendor/symfony/validator/Resources/translations/validators.my.xlf</argument>
+            <argument>/home/romain/Bureau/Symfony/TodoListSymfony/project_light/vendor/symfony/form/Resources/translations/validators.my.xlf</argument>
+            <argument>/home/romain/Bureau/Symfony/TodoListSymfony/project_light/vendor/symfony/security-core/Resources/translations/security.my.xlf</argument>
+          </argument>
+          <argument key="nb" type="collection">
+            <argument>/home/romain/Bureau/Symfony/TodoListSymfony/project_light/vendor/symfony/validator/Resources/translations/validators.nb.xlf</argument>
+            <argument>/home/romain/Bureau/Symfony/TodoListSymfony/project_light/vendor/symfony/form/Resources/translations/validators.nb.xlf</argument>
+            <argument>/home/romain/Bureau/Symfony/TodoListSymfony/project_light/vendor/symfony/security-core/Resources/translations/security.nb.xlf</argument>
+          </argument>
+          <argument key="nl" type="collection">
+            <argument>/home/romain/Bureau/Symfony/TodoListSymfony/project_light/vendor/symfony/validator/Resources/translations/validators.nl.xlf</argument>
+            <argument>/home/romain/Bureau/Symfony/TodoListSymfony/project_light/vendor/symfony/form/Resources/translations/validators.nl.xlf</argument>
+            <argument>/home/romain/Bureau/Symfony/TodoListSymfony/project_light/vendor/symfony/security-core/Resources/translations/security.nl.xlf</argument>
+            <argument>/home/romain/Bureau/Symfony/TodoListSymfony/project_light/vendor/symfonycasts/verify-email-bundle/src/Resources/translations/VerifyEmailBundle+intl-icu.nl.xlf</argument>
+          </argument>
+          <argument key="nn" type="collection">
+            <argument>/home/romain/Bureau/Symfony/TodoListSymfony/project_light/vendor/symfony/validator/Resources/translations/validators.nn.xlf</argument>
+            <argument>/home/romain/Bureau/Symfony/TodoListSymfony/project_light/vendor/symfony/form/Resources/translations/validators.nn.xlf</argument>
+            <argument>/home/romain/Bureau/Symfony/TodoListSymfony/project_light/vendor/symfony/security-core/Resources/translations/security.nn.xlf</argument>
+          </argument>
+          <argument key="no" type="collection">
+            <argument>/home/romain/Bureau/Symfony/TodoListSymfony/project_light/vendor/symfony/validator/Resources/translations/validators.no.xlf</argument>
+            <argument>/home/romain/Bureau/Symfony/TodoListSymfony/project_light/vendor/symfony/form/Resources/translations/validators.no.xlf</argument>
+            <argument>/home/romain/Bureau/Symfony/TodoListSymfony/project_light/vendor/symfony/security-core/Resources/translations/security.no.xlf</argument>
+          </argument>
+          <argument key="pl" type="collection">
+            <argument>/home/romain/Bureau/Symfony/TodoListSymfony/project_light/vendor/symfony/validator/Resources/translations/validators.pl.xlf</argument>
+            <argument>/home/romain/Bureau/Symfony/TodoListSymfony/project_light/vendor/symfony/form/Resources/translations/validators.pl.xlf</argument>
+            <argument>/home/romain/Bureau/Symfony/TodoListSymfony/project_light/vendor/symfony/security-core/Resources/translations/security.pl.xlf</argument>
+            <argument>/home/romain/Bureau/Symfony/TodoListSymfony/project_light/vendor/symfonycasts/verify-email-bundle/src/Resources/translations/VerifyEmailBundle.pl.xlf</argument>
+          </argument>
+          <argument key="pt" type="collection">
+            <argument>/home/romain/Bureau/Symfony/TodoListSymfony/project_light/vendor/symfony/validator/Resources/translations/validators.pt.xlf</argument>
+            <argument>/home/romain/Bureau/Symfony/TodoListSymfony/project_light/vendor/symfony/form/Resources/translations/validators.pt.xlf</argument>
+            <argument>/home/romain/Bureau/Symfony/TodoListSymfony/project_light/vendor/symfony/security-core/Resources/translations/security.pt.xlf</argument>
+            <argument>/home/romain/Bureau/Symfony/TodoListSymfony/project_light/vendor/symfonycasts/verify-email-bundle/src/Resources/translations/VerifyEmailBundle.pt.xlf</argument>
+          </argument>
+          <argument key="pt_BR" type="collection">
+            <argument>/home/romain/Bureau/Symfony/TodoListSymfony/project_light/vendor/symfony/validator/Resources/translations/validators.pt_BR.xlf</argument>
+            <argument>/home/romain/Bureau/Symfony/TodoListSymfony/project_light/vendor/symfony/form/Resources/translations/validators.pt_BR.xlf</argument>
+            <argument>/home/romain/Bureau/Symfony/TodoListSymfony/project_light/vendor/symfony/security-core/Resources/translations/security.pt_BR.xlf</argument>
+          </argument>
+          <argument key="ro" type="collection">
+            <argument>/home/romain/Bureau/Symfony/TodoListSymfony/project_light/vendor/symfony/validator/Resources/translations/validators.ro.xlf</argument>
+            <argument>/home/romain/Bureau/Symfony/TodoListSymfony/project_light/vendor/symfony/form/Resources/translations/validators.ro.xlf</argument>
+            <argument>/home/romain/Bureau/Symfony/TodoListSymfony/project_light/vendor/symfony/security-core/Resources/translations/security.ro.xlf</argument>
+            <argument>/home/romain/Bureau/Symfony/TodoListSymfony/project_light/vendor/symfonycasts/verify-email-bundle/src/Resources/translations/VerifyEmailBundle.ro.xlf</argument>
+          </argument>
+          <argument key="ru" type="collection">
+            <argument>/home/romain/Bureau/Symfony/TodoListSymfony/project_light/vendor/symfony/validator/Resources/translations/validators.ru.xlf</argument>
+            <argument>/home/romain/Bureau/Symfony/TodoListSymfony/project_light/vendor/symfony/form/Resources/translations/validators.ru.xlf</argument>
+            <argument>/home/romain/Bureau/Symfony/TodoListSymfony/project_light/vendor/symfony/security-core/Resources/translations/security.ru.xlf</argument>
+            <argument>/home/romain/Bureau/Symfony/TodoListSymfony/project_light/vendor/symfonycasts/verify-email-bundle/src/Resources/translations/VerifyEmailBundle.ru.xlf</argument>
+          </argument>
+          <argument key="sk" type="collection">
+            <argument>/home/romain/Bureau/Symfony/TodoListSymfony/project_light/vendor/symfony/validator/Resources/translations/validators.sk.xlf</argument>
+            <argument>/home/romain/Bureau/Symfony/TodoListSymfony/project_light/vendor/symfony/form/Resources/translations/validators.sk.xlf</argument>
+            <argument>/home/romain/Bureau/Symfony/TodoListSymfony/project_light/vendor/symfony/security-core/Resources/translations/security.sk.xlf</argument>
+            <argument>/home/romain/Bureau/Symfony/TodoListSymfony/project_light/vendor/symfonycasts/verify-email-bundle/src/Resources/translations/VerifyEmailBundle.sk.xlf</argument>
+          </argument>
+          <argument key="sl" type="collection">
+            <argument>/home/romain/Bureau/Symfony/TodoListSymfony/project_light/vendor/symfony/validator/Resources/translations/validators.sl.xlf</argument>
+            <argument>/home/romain/Bureau/Symfony/TodoListSymfony/project_light/vendor/symfony/form/Resources/translations/validators.sl.xlf</argument>
+            <argument>/home/romain/Bureau/Symfony/TodoListSymfony/project_light/vendor/symfony/security-core/Resources/translations/security.sl.xlf</argument>
+          </argument>
+          <argument key="sq" type="collection">
+            <argument>/home/romain/Bureau/Symfony/TodoListSymfony/project_light/vendor/symfony/validator/Resources/translations/validators.sq.xlf</argument>
+            <argument>/home/romain/Bureau/Symfony/TodoListSymfony/project_light/vendor/symfony/form/Resources/translations/validators.sq.xlf</argument>
+            <argument>/home/romain/Bureau/Symfony/TodoListSymfony/project_light/vendor/symfony/security-core/Resources/translations/security.sq.xlf</argument>
+          </argument>
+          <argument key="sr_Cyrl" type="collection">
+            <argument>/home/romain/Bureau/Symfony/TodoListSymfony/project_light/vendor/symfony/validator/Resources/translations/validators.sr_Cyrl.xlf</argument>
+            <argument>/home/romain/Bureau/Symfony/TodoListSymfony/project_light/vendor/symfony/form/Resources/translations/validators.sr_Cyrl.xlf</argument>
+            <argument>/home/romain/Bureau/Symfony/TodoListSymfony/project_light/vendor/symfony/security-core/Resources/translations/security.sr_Cyrl.xlf</argument>
+          </argument>
+          <argument key="sr_Latn" type="collection">
+            <argument>/home/romain/Bureau/Symfony/TodoListSymfony/project_light/vendor/symfony/validator/Resources/translations/validators.sr_Latn.xlf</argument>
+            <argument>/home/romain/Bureau/Symfony/TodoListSymfony/project_light/vendor/symfony/form/Resources/translations/validators.sr_Latn.xlf</argument>
+            <argument>/home/romain/Bureau/Symfony/TodoListSymfony/project_light/vendor/symfony/security-core/Resources/translations/security.sr_Latn.xlf</argument>
+          </argument>
+          <argument key="sv" type="collection">
+            <argument>/home/romain/Bureau/Symfony/TodoListSymfony/project_light/vendor/symfony/validator/Resources/translations/validators.sv.xlf</argument>
+            <argument>/home/romain/Bureau/Symfony/TodoListSymfony/project_light/vendor/symfony/form/Resources/translations/validators.sv.xlf</argument>
+            <argument>/home/romain/Bureau/Symfony/TodoListSymfony/project_light/vendor/symfony/security-core/Resources/translations/security.sv.xlf</argument>
+          </argument>
+          <argument key="th" type="collection">
+            <argument>/home/romain/Bureau/Symfony/TodoListSymfony/project_light/vendor/symfony/validator/Resources/translations/validators.th.xlf</argument>
+            <argument>/home/romain/Bureau/Symfony/TodoListSymfony/project_light/vendor/symfony/form/Resources/translations/validators.th.xlf</argument>
+            <argument>/home/romain/Bureau/Symfony/TodoListSymfony/project_light/vendor/symfony/security-core/Resources/translations/security.th.xlf</argument>
+          </argument>
+          <argument key="tl" type="collection">
+            <argument>/home/romain/Bureau/Symfony/TodoListSymfony/project_light/vendor/symfony/validator/Resources/translations/validators.tl.xlf</argument>
+            <argument>/home/romain/Bureau/Symfony/TodoListSymfony/project_light/vendor/symfony/form/Resources/translations/validators.tl.xlf</argument>
+            <argument>/home/romain/Bureau/Symfony/TodoListSymfony/project_light/vendor/symfony/security-core/Resources/translations/security.tl.xlf</argument>
+          </argument>
+          <argument key="tr" type="collection">
+            <argument>/home/romain/Bureau/Symfony/TodoListSymfony/project_light/vendor/symfony/validator/Resources/translations/validators.tr.xlf</argument>
+            <argument>/home/romain/Bureau/Symfony/TodoListSymfony/project_light/vendor/symfony/form/Resources/translations/validators.tr.xlf</argument>
+            <argument>/home/romain/Bureau/Symfony/TodoListSymfony/project_light/vendor/symfony/security-core/Resources/translations/security.tr.xlf</argument>
+            <argument>/home/romain/Bureau/Symfony/TodoListSymfony/project_light/vendor/symfonycasts/verify-email-bundle/src/Resources/translations/VerifyEmailBundle.tr.xlf</argument>
+          </argument>
+          <argument key="uk" type="collection">
+            <argument>/home/romain/Bureau/Symfony/TodoListSymfony/project_light/vendor/symfony/validator/Resources/translations/validators.uk.xlf</argument>
+            <argument>/home/romain/Bureau/Symfony/TodoListSymfony/project_light/vendor/symfony/form/Resources/translations/validators.uk.xlf</argument>
+            <argument>/home/romain/Bureau/Symfony/TodoListSymfony/project_light/vendor/symfony/security-core/Resources/translations/security.uk.xlf</argument>
+            <argument>/home/romain/Bureau/Symfony/TodoListSymfony/project_light/vendor/symfonycasts/verify-email-bundle/src/Resources/translations/VerifyEmailBundle.uk.xlf</argument>
+          </argument>
+          <argument key="ur" type="collection">
+            <argument>/home/romain/Bureau/Symfony/TodoListSymfony/project_light/vendor/symfony/validator/Resources/translations/validators.ur.xlf</argument>
+            <argument>/home/romain/Bureau/Symfony/TodoListSymfony/project_light/vendor/symfony/form/Resources/translations/validators.ur.xlf</argument>
+            <argument>/home/romain/Bureau/Symfony/TodoListSymfony/project_light/vendor/symfony/security-core/Resources/translations/security.ur.xlf</argument>
+          </argument>
+          <argument key="uz" type="collection">
+            <argument>/home/romain/Bureau/Symfony/TodoListSymfony/project_light/vendor/symfony/validator/Resources/translations/validators.uz.xlf</argument>
+            <argument>/home/romain/Bureau/Symfony/TodoListSymfony/project_light/vendor/symfony/form/Resources/translations/validators.uz.xlf</argument>
+            <argument>/home/romain/Bureau/Symfony/TodoListSymfony/project_light/vendor/symfony/security-core/Resources/translations/security.uz.xlf</argument>
+          </argument>
+          <argument key="vi" type="collection">
+            <argument>/home/romain/Bureau/Symfony/TodoListSymfony/project_light/vendor/symfony/validator/Resources/translations/validators.vi.xlf</argument>
+            <argument>/home/romain/Bureau/Symfony/TodoListSymfony/project_light/vendor/symfony/form/Resources/translations/validators.vi.xlf</argument>
+            <argument>/home/romain/Bureau/Symfony/TodoListSymfony/project_light/vendor/symfony/security-core/Resources/translations/security.vi.xlf</argument>
+          </argument>
+          <argument key="zh_CN" type="collection">
+            <argument>/home/romain/Bureau/Symfony/TodoListSymfony/project_light/vendor/symfony/validator/Resources/translations/validators.zh_CN.xlf</argument>
+            <argument>/home/romain/Bureau/Symfony/TodoListSymfony/project_light/vendor/symfony/form/Resources/translations/validators.zh_CN.xlf</argument>
+            <argument>/home/romain/Bureau/Symfony/TodoListSymfony/project_light/vendor/symfony/security-core/Resources/translations/security.zh_CN.xlf</argument>
+          </argument>
+          <argument key="zh_TW" type="collection">
+            <argument>/home/romain/Bureau/Symfony/TodoListSymfony/project_light/vendor/symfony/validator/Resources/translations/validators.zh_TW.xlf</argument>
+            <argument>/home/romain/Bureau/Symfony/TodoListSymfony/project_light/vendor/symfony/form/Resources/translations/validators.zh_TW.xlf</argument>
+            <argument>/home/romain/Bureau/Symfony/TodoListSymfony/project_light/vendor/symfony/security-core/Resources/translations/security.zh_TW.xlf</argument>
+          </argument>
+          <argument key="sr" type="collection">
+            <argument>/home/romain/Bureau/Symfony/TodoListSymfony/project_light/vendor/symfonycasts/verify-email-bundle/src/Resources/translations/VerifyEmailBundle.sr.xlf</argument>
+          </argument>
+        </argument>
+        <argument key="scanned_directories" type="collection">
+          <argument>/home/romain/Bureau/Symfony/TodoListSymfony/project_light/vendor/symfony/validator/Resources/translations</argument>
+          <argument>/home/romain/Bureau/Symfony/TodoListSymfony/project_light/vendor/symfony/form/Resources/translations</argument>
+          <argument>/home/romain/Bureau/Symfony/TodoListSymfony/project_light/vendor/symfony/security-core/Resources/translations</argument>
+          <argument>/home/romain/Bureau/Symfony/TodoListSymfony/project_light/vendor/symfonycasts/verify-email-bundle/src/Resources/translations</argument>
+          <argument>/home/romain/Bureau/Symfony/TodoListSymfony/project_light/translations</argument>
+          <argument>/home/romain/Bureau/Symfony/TodoListSymfony/project_light/vendor/symfony/framework-bundle/translations</argument>
+          <argument>/home/romain/Bureau/Symfony/TodoListSymfony/project_light/vendor/doctrine/doctrine-bundle/translations</argument>
+          <argument>/home/romain/Bureau/Symfony/TodoListSymfony/project_light/vendor/doctrine/doctrine-migrations-bundle/translations</argument>
+          <argument>/home/romain/Bureau/Symfony/TodoListSymfony/project_light/vendor/symfony/twig-bundle/translations</argument>
+          <argument>/home/romain/Bureau/Symfony/TodoListSymfony/project_light/vendor/twig/extra-bundle/translations</argument>
+          <argument>/home/romain/Bureau/Symfony/TodoListSymfony/project_light/vendor/symfony/maker-bundle/translations</argument>
+          <argument>/home/romain/Bureau/Symfony/TodoListSymfony/project_light/vendor/doctrine/doctrine-fixtures-bundle/translations</argument>
+          <argument>/home/romain/Bureau/Symfony/TodoListSymfony/project_light/vendor/symfony/security-bundle/translations</argument>
+          <argument>/home/romain/Bureau/Symfony/TodoListSymfony/project_light/vendor/symfony/web-profiler-bundle/translations</argument>
+          <argument>/home/romain/Bureau/Symfony/TodoListSymfony/project_light/vendor/symfony/webpack-encore-bundle/src/translations</argument>
+        </argument>
+        <argument key="cache_vary" type="collection">
+          <argument key="scanned_directories" type="collection">
+            <argument>vendor/symfony/validator/Resources/translations</argument>
+            <argument>vendor/symfony/form/Resources/translations</argument>
+            <argument>vendor/symfony/security-core/Resources/translations</argument>
+            <argument>vendor/symfonycasts/verify-email-bundle/src/Resources/translations</argument>
+            <argument>translations</argument>
+            <argument>vendor/symfony/framework-bundle/translations</argument>
+            <argument>vendor/doctrine/doctrine-bundle/translations</argument>
+            <argument>vendor/doctrine/doctrine-migrations-bundle/translations</argument>
+            <argument>vendor/symfony/twig-bundle/translations</argument>
+            <argument>vendor/twig/extra-bundle/translations</argument>
+            <argument>vendor/symfony/maker-bundle/translations</argument>
+            <argument>vendor/doctrine/doctrine-fixtures-bundle/translations</argument>
+            <argument>vendor/symfony/security-bundle/translations</argument>
+            <argument>vendor/symfony/web-profiler-bundle/translations</argument>
+            <argument>vendor/symfony/webpack-encore-bundle/src/translations</argument>
+          </argument>
+        </argument>
+      </argument>
+      <argument type="collection"/>
+      <call method="setConfigCacheFactory">
+        <argument type="service" id="config_cache_factory"/>
+      </call>
+      <call method="setFallbackLocales">
+        <argument type="collection">
+          <argument>fr</argument>
+        </argument>
+      </call>
+    </service>
+    <service id="translator.logging" class="Symfony\Component\Translation\LoggingTranslator">
+      <tag name="monolog.logger" channel="translation"/>
+      <argument type="service" id="translator.logging.inner"/>
+      <argument type="service" id="logger"/>
+    </service>
+    <service id="translator.formatter.default" class="Symfony\Component\Translation\Formatter\MessageFormatter">
+      <argument type="service" id="identity_translator"/>
+    </service>
+    <service id="translation.loader.php" class="Symfony\Component\Translation\Loader\PhpFileLoader">
+      <tag name="translation.loader" alias="php"/>
+    </service>
+    <service id="translation.loader.yml" class="Symfony\Component\Translation\Loader\YamlFileLoader">
+      <tag name="translation.loader" alias="yaml" legacy-alias="yml"/>
+    </service>
+    <service id="translation.loader.xliff" class="Symfony\Component\Translation\Loader\XliffFileLoader">
+      <tag name="translation.loader" alias="xlf" legacy-alias="xliff"/>
+    </service>
+    <service id="translation.loader.po" class="Symfony\Component\Translation\Loader\PoFileLoader">
+      <tag name="translation.loader" alias="po"/>
+    </service>
+    <service id="translation.loader.mo" class="Symfony\Component\Translation\Loader\MoFileLoader">
+      <tag name="translation.loader" alias="mo"/>
+    </service>
+    <service id="translation.loader.qt" class="Symfony\Component\Translation\Loader\QtFileLoader">
+      <tag name="translation.loader" alias="ts"/>
+    </service>
+    <service id="translation.loader.csv" class="Symfony\Component\Translation\Loader\CsvFileLoader">
+      <tag name="translation.loader" alias="csv"/>
+    </service>
+    <service id="translation.loader.res" class="Symfony\Component\Translation\Loader\IcuResFileLoader">
+      <tag name="translation.loader" alias="res"/>
+    </service>
+    <service id="translation.loader.dat" class="Symfony\Component\Translation\Loader\IcuDatFileLoader">
+      <tag name="translation.loader" alias="dat"/>
+    </service>
+    <service id="translation.loader.ini" class="Symfony\Component\Translation\Loader\IniFileLoader">
+      <tag name="translation.loader" alias="ini"/>
+    </service>
+    <service id="translation.loader.json" class="Symfony\Component\Translation\Loader\JsonFileLoader">
+      <tag name="translation.loader" alias="json"/>
+    </service>
+    <service id="translation.dumper.php" class="Symfony\Component\Translation\Dumper\PhpFileDumper">
+      <tag name="translation.dumper" alias="php"/>
+    </service>
+    <service id="translation.dumper.xliff" class="Symfony\Component\Translation\Dumper\XliffFileDumper">
+      <tag name="translation.dumper" alias="xlf"/>
+    </service>
+    <service id="translation.dumper.xliff.xliff" class="Symfony\Component\Translation\Dumper\XliffFileDumper">
+      <tag name="translation.dumper" alias="xliff"/>
+      <argument>xliff</argument>
+    </service>
+    <service id="translation.dumper.po" class="Symfony\Component\Translation\Dumper\PoFileDumper">
+      <tag name="translation.dumper" alias="po"/>
+    </service>
+    <service id="translation.dumper.mo" class="Symfony\Component\Translation\Dumper\MoFileDumper">
+      <tag name="translation.dumper" alias="mo"/>
+    </service>
+    <service id="translation.dumper.yml" class="Symfony\Component\Translation\Dumper\YamlFileDumper">
+      <tag name="translation.dumper" alias="yml"/>
+    </service>
+    <service id="translation.dumper.yaml" class="Symfony\Component\Translation\Dumper\YamlFileDumper">
+      <tag name="translation.dumper" alias="yaml"/>
+      <argument>yaml</argument>
+    </service>
+    <service id="translation.dumper.qt" class="Symfony\Component\Translation\Dumper\QtFileDumper">
+      <tag name="translation.dumper" alias="ts"/>
+    </service>
+    <service id="translation.dumper.csv" class="Symfony\Component\Translation\Dumper\CsvFileDumper">
+      <tag name="translation.dumper" alias="csv"/>
+    </service>
+    <service id="translation.dumper.ini" class="Symfony\Component\Translation\Dumper\IniFileDumper">
+      <tag name="translation.dumper" alias="ini"/>
+    </service>
+    <service id="translation.dumper.json" class="Symfony\Component\Translation\Dumper\JsonFileDumper">
+      <tag name="translation.dumper" alias="json"/>
+    </service>
+    <service id="translation.dumper.res" class="Symfony\Component\Translation\Dumper\IcuResFileDumper">
+      <tag name="translation.dumper" alias="res"/>
+    </service>
+    <service id="translation.extractor.php_ast" class="Symfony\Component\Translation\Extractor\PhpAstExtractor">
+      <tag name="translation.extractor" alias="php"/>
+      <argument type="tagged_iterator" tag="translation.extractor.visitor"/>
+    </service>
+    <service id="translation.extractor.visitor.trans_method" class="Symfony\Component\Translation\Extractor\Visitor\TransMethodVisitor">
+      <tag name="translation.extractor.visitor"/>
+    </service>
+    <service id="translation.extractor.visitor.translatable_message" class="Symfony\Component\Translation\Extractor\Visitor\TranslatableMessageVisitor">
+      <tag name="translation.extractor.visitor"/>
+    </service>
+    <service id="translation.extractor.visitor.constraint" class="Symfony\Component\Translation\Extractor\Visitor\ConstraintVisitor">
+      <tag name="translation.extractor.visitor"/>
+      <argument type="collection">
+        <argument>All</argument>
+        <argument>AtLeastOneOf</argument>
+        <argument>Bic</argument>
+        <argument>Blank</argument>
+        <argument>Callback</argument>
+        <argument>CardScheme</argument>
+        <argument>Charset</argument>
+        <argument>Choice</argument>
+        <argument>Cidr</argument>
+        <argument>Collection</argument>
+        <argument>Compound</argument>
+        <argument>Count</argument>
+        <argument>Country</argument>
+        <argument>CssColor</argument>
+        <argument>Currency</argument>
+        <argument>DateTime</argument>
+        <argument>Date</argument>
+        <argument>DivisibleBy</argument>
+        <argument>Email</argument>
+        <argument>EqualTo</argument>
+        <argument>ExpressionSyntax</argument>
+        <argument>Expression</argument>
+        <argument>File</argument>
+        <argument>GreaterThanOrEqual</argument>
+        <argument>GreaterThan</argument>
+        <argument>Hostname</argument>
+        <argument>Iban</argument>
+        <argument>IdenticalTo</argument>
+        <argument>Image</argument>
+        <argument>Ip</argument>
+        <argument>IsFalse</argument>
+        <argument>IsNull</argument>
+        <argument>IsTrue</argument>
+        <argument>Isbn</argument>
+        <argument>Isin</argument>
+        <argument>Issn</argument>
+        <argument>Json</argument>
+        <argument>Language</argument>
+        <argument>Length</argument>
+        <argument>LessThanOrEqual</argument>
+        <argument>LessThan</argument>
+        <argument>Locale</argument>
+        <argument>Luhn</argument>
+        <argument>MacAddress</argument>
+        <argument>NoSuspiciousCharacters</argument>
+        <argument>NotBlank</argument>
+        <argument>NotCompromisedPassword</argument>
+        <argument>NotEqualTo</argument>
+        <argument>NotIdenticalTo</argument>
+        <argument>NotNull</argument>
+        <argument>PasswordStrength</argument>
+        <argument>Range</argument>
+        <argument>Regex</argument>
+        <argument>Sequentially</argument>
+        <argument>Time</argument>
+        <argument>Timezone</argument>
+        <argument>Type</argument>
+        <argument>Ulid</argument>
+        <argument>Unique</argument>
+        <argument>Url</argument>
+        <argument>Uuid</argument>
+        <argument>Valid</argument>
+        <argument>Week</argument>
+        <argument>When</argument>
+        <argument>WordCount</argument>
+        <argument>Yaml</argument>
+        <argument>Expression</argument>
+        <argument>Email</argument>
+        <argument>NotCompromisedPassword</argument>
+        <argument>When</argument>
+        <argument>NoSuspiciousCharacters</argument>
+        <argument>UniqueEntity</argument>
+        <argument>UserPassword</argument>
+      </argument>
+    </service>
+    <service id="translation.reader" class="Symfony\Component\Translation\Reader\TranslationReader">
+      <call method="addLoader">
+        <argument>php</argument>
+        <argument type="service" id="translation.loader.php"/>
+      </call>
+      <call method="addLoader">
+        <argument>yaml</argument>
+        <argument type="service" id="translation.loader.yml"/>
+      </call>
+      <call method="addLoader">
+        <argument>yml</argument>
+        <argument type="service" id="translation.loader.yml"/>
+      </call>
+      <call method="addLoader">
+        <argument>xlf</argument>
+        <argument type="service" id="translation.loader.xliff"/>
+      </call>
+      <call method="addLoader">
+        <argument>xliff</argument>
+        <argument type="service" id="translation.loader.xliff"/>
+      </call>
+      <call method="addLoader">
+        <argument>po</argument>
+        <argument type="service" id="translation.loader.po"/>
+      </call>
+      <call method="addLoader">
+        <argument>mo</argument>
+        <argument type="service" id="translation.loader.mo"/>
+      </call>
+      <call method="addLoader">
+        <argument>ts</argument>
+        <argument type="service" id="translation.loader.qt"/>
+      </call>
+      <call method="addLoader">
+        <argument>csv</argument>
+        <argument type="service" id="translation.loader.csv"/>
+      </call>
+      <call method="addLoader">
+        <argument>res</argument>
+        <argument type="service" id="translation.loader.res"/>
+      </call>
+      <call method="addLoader">
+        <argument>dat</argument>
+        <argument type="service" id="translation.loader.dat"/>
+      </call>
+      <call method="addLoader">
+        <argument>ini</argument>
+        <argument type="service" id="translation.loader.ini"/>
+      </call>
+      <call method="addLoader">
+        <argument>json</argument>
+        <argument type="service" id="translation.loader.json"/>
+      </call>
+    </service>
+    <service id="translation.extractor" class="Symfony\Component\Translation\Extractor\ChainExtractor">
+      <call method="addExtractor">
+        <argument>php</argument>
+        <argument type="service" id="translation.extractor.php_ast"/>
+      </call>
+      <call method="addExtractor">
+        <argument>twig</argument>
+        <argument type="service" id="twig.translation.extractor"/>
+      </call>
+    </service>
+    <service id="translation.writer" class="Symfony\Component\Translation\Writer\TranslationWriter">
+      <call method="addDumper">
+        <argument>php</argument>
+        <argument type="service" id="translation.dumper.php"/>
+      </call>
+      <call method="addDumper">
+        <argument>xlf</argument>
+        <argument type="service" id="translation.dumper.xliff"/>
+      </call>
+      <call method="addDumper">
+        <argument>xliff</argument>
+        <argument type="service" id="translation.dumper.xliff.xliff"/>
+      </call>
+      <call method="addDumper">
+        <argument>po</argument>
+        <argument type="service" id="translation.dumper.po"/>
+      </call>
+      <call method="addDumper">
+        <argument>mo</argument>
+        <argument type="service" id="translation.dumper.mo"/>
+      </call>
+      <call method="addDumper">
+        <argument>yml</argument>
+        <argument type="service" id="translation.dumper.yml"/>
+      </call>
+      <call method="addDumper">
+        <argument>yaml</argument>
+        <argument type="service" id="translation.dumper.yaml"/>
+      </call>
+      <call method="addDumper">
+        <argument>ts</argument>
+        <argument type="service" id="translation.dumper.qt"/>
+      </call>
+      <call method="addDumper">
+        <argument>csv</argument>
+        <argument type="service" id="translation.dumper.csv"/>
+      </call>
+      <call method="addDumper">
+        <argument>ini</argument>
+        <argument type="service" id="translation.dumper.ini"/>
+      </call>
+      <call method="addDumper">
+        <argument>json</argument>
+        <argument type="service" id="translation.dumper.json"/>
+      </call>
+      <call method="addDumper">
+        <argument>res</argument>
+        <argument type="service" id="translation.dumper.res"/>
+      </call>
+    </service>
+    <service id="translation.warmer" class="Symfony\Bundle\FrameworkBundle\CacheWarmer\TranslationsCacheWarmer">
+      <tag name="container.service_subscriber" id="translator"/>
+      <tag name="kernel.cache_warmer"/>
+      <argument type="service" id=".service_locator.7jukgan.translation.warmer"/>
+    </service>
+    <service id="translation.locale_switcher" class="Symfony\Component\Translation\LocaleSwitcher">
+      <tag name="kernel.reset" method="reset"/>
+      <tag name="kernel.locale_aware"/>
+      <argument>fr</argument>
+      <argument type="tagged_iterator" tag="kernel.locale_aware" exclude="translation.locale_switcher"/>
+      <argument type="service" id="router.request_context" on-invalid="ignore"/>
+    </service>
+    <service id="translation.provider_collection" class="Symfony\Component\Translation\Provider\TranslationProviderCollection">
+      <argument type="collection"/>
+      <factory service="translation.provider_collection_factory" method="fromConfig"/>
+    </service>
+    <service id="translation.provider_collection_factory" class="Symfony\Component\Translation\Provider\TranslationProviderCollectionFactory">
+      <argument type="tagged_iterator" tag="translation.provider_factory"/>
+      <argument type="collection"/>
+    </service>
+    <service id="translation.provider_factory.null" class="Symfony\Component\Translation\Provider\NullProviderFactory">
+      <tag name="translation.provider_factory"/>
     </service>
     <service id="debug.error_handler_configurator" class="Symfony\Component\HttpKernel\Debug\ErrorHandlerConfigurator" public="true">
       <tag name="monolog.logger" channel="php"/>
@@ -1892,7 +2722,7 @@
     </service>
     <service id="argument_resolver.not_tagged_controller" class="Symfony\Component\HttpKernel\Controller\ArgumentResolver\NotTaggedControllerValueResolver">
       <tag name="controller.argument_value_resolver" priority="-200"/>
-      <argument type="service" id=".service_locator.I4_FRn2"/>
+      <argument type="service" id=".service_locator.btbRW75"/>
     </service>
     <service id="routing.resolver" class="Symfony\Component\Config\Loader\LoaderResolver">
       <call method="addLoader">
@@ -1999,7 +2829,7 @@
       <argument type="service" id="router.request_context" on-invalid="ignore"/>
       <argument type="service" id="parameter_bag" on-invalid="ignore"/>
       <argument type="service" id="logger" on-invalid="ignore"/>
-      <argument>en</argument>
+      <argument>fr</argument>
       <call method="setConfigCacheFactory">
         <argument type="service" id="config_cache_factory"/>
       </call>
@@ -2253,6 +3083,7 @@
           <argument type="service" id="form.type_extension.form.transformation_failure_handling"/>
           <argument type="service" id="form.type_extension.form.http_foundation"/>
           <argument type="service" id="form.type_extension.form.validator"/>
+          <argument type="service" id="form.type_extension.upload.validator"/>
           <argument type="service" id="form.type_extension.csrf"/>
           <argument type="service" id="form.type_extension.form.data_collector"/>
           <argument type="service" id="form.type_extension.form.password_hasher"/>
@@ -2292,19 +3123,19 @@
     <service id="form.type.choice" class="Symfony\Component\Form\Extension\Core\Type\ChoiceType">
       <tag name="form.type"/>
       <argument type="service" id="form.choice_list_factory.cached"/>
-      <argument>null</argument>
+      <argument type="service" id="translator.data_collector" on-invalid="ignore"/>
     </service>
     <service id="form.type.file" class="Symfony\Component\Form\Extension\Core\Type\FileType">
       <tag name="form.type"/>
-      <argument>null</argument>
+      <argument type="service" id="translator.data_collector" on-invalid="ignore"/>
     </service>
     <service id="form.type.color" class="Symfony\Component\Form\Extension\Core\Type\ColorType">
       <tag name="form.type"/>
-      <argument>null</argument>
+      <argument type="service" id="translator.data_collector" on-invalid="ignore"/>
     </service>
     <service id="form.type_extension.form.transformation_failure_handling" class="Symfony\Component\Form\Extension\Core\Type\TransformationFailureExtension">
       <tag name="form.type_extension" extended-type="Symfony\Component\Form\Extension\Core\Type\FormType"/>
-      <argument>null</argument>
+      <argument type="service" id="translator.data_collector" on-invalid="ignore"/>
     </service>
     <service id="form.type_extension.form.http_foundation" class="Symfony\Component\Form\Extension\HttpFoundation\Type\FormTypeHttpFoundationExtension">
       <tag name="form.type_extension"/>
@@ -2321,7 +3152,7 @@
       <argument type="service" id="debug.validator"/>
       <argument>false</argument>
       <argument type="service" id="twig.form.renderer" on-invalid="ignore"/>
-      <argument>null</argument>
+      <argument type="service" id="translator.data_collector" on-invalid="ignore"/>
     </service>
     <service id="form.type_extension.repeated.validator" class="Symfony\Component\Form\Extension\Validator\Type\RepeatedTypeValidatorExtension">
       <tag name="form.type_extension"/>
@@ -2329,12 +3160,17 @@
     <service id="form.type_extension.submit.validator" class="Symfony\Component\Form\Extension\Validator\Type\SubmitTypeValidatorExtension">
       <tag name="form.type_extension" extended-type="Symfony\Component\Form\Extension\Core\Type\SubmitType"/>
     </service>
+    <service id="form.type_extension.upload.validator" class="Symfony\Component\Form\Extension\Validator\Type\UploadValidatorExtension">
+      <tag name="form.type_extension"/>
+      <argument type="service" id="translator.data_collector"/>
+      <argument>validators</argument>
+    </service>
     <service id="form.type_extension.csrf" class="Symfony\Component\Form\Extension\Csrf\Type\FormTypeCsrfExtension">
       <tag name="form.type_extension"/>
       <argument type="service" id="security.csrf.same_origin_token_manager"/>
       <argument>true</argument>
       <argument>_token</argument>
-      <argument>null</argument>
+      <argument type="service" id="translator.data_collector" on-invalid="null"/>
       <argument>validators</argument>
       <argument type="service" id="form.server_params"/>
       <argument>%form.type_extension.csrf.field_attr%</argument>
@@ -2346,6 +3182,9 @@
       </call>
       <call method="setGroupProviderLocator">
         <argument type="service" id=".service_locator.GIuJv7e"/>
+      </call>
+      <call method="setTranslator">
+        <argument type="service" id="translator.data_collector" on-invalid="ignore"/>
       </call>
       <call method="setTranslationDomain">
         <argument>validators</argument>
@@ -2727,6 +3566,9 @@
         <argument type="service" id="data_collector.cache"/>
       </call>
       <call method="add">
+        <argument type="service" id="data_collector.translation"/>
+      </call>
+      <call method="add">
         <argument type="service" id="data_collector.security"/>
       </call>
       <call method="add">
@@ -2907,6 +3749,13 @@
     <service id="data_collector.validator" class="Symfony\Component\Validator\DataCollector\ValidatorDataCollector">
       <tag name="data_collector" template="@WebProfiler/Collector/validator.html.twig" id="validator" priority="320"/>
       <argument type="service" id="debug.validator"/>
+    </service>
+    <service id="translator.data_collector" class="Symfony\Component\Translation\DataCollectorTranslator">
+      <argument type="service" id="translator.default"/>
+    </service>
+    <service id="data_collector.translation" class="Symfony\Component\Translation\DataCollector\TranslationDataCollector">
+      <tag name="data_collector" template="@WebProfiler/Collector/translation.html.twig" id="translation" priority="275"/>
+      <argument type="service" id="translator.data_collector"/>
     </service>
     <service id="data_collector.http_client" class="Symfony\Component\HttpClient\DataCollector\HttpClientDataCollector">
       <tag name="data_collector" template="@WebProfiler/Collector/http_client.html.twig" id="http_client" priority="250"/>
@@ -3711,6 +4560,9 @@
       <call method="setRequestStack">
         <argument type="service" id="request_stack" on-invalid="ignore"/>
       </call>
+      <call method="setLocaleSwitcher">
+        <argument type="service" id="translation.locale_switcher" on-invalid="ignore"/>
+      </call>
       <call method="setEnabledLocales">
         <argument type="collection"/>
       </call>
@@ -3796,7 +4648,7 @@
     </service>
     <service id="twig.extension.trans" class="Symfony\Bridge\Twig\Extension\TranslationExtension">
       <tag name="twig.extension"/>
-      <argument>null</argument>
+      <argument type="service" id="translator.data_collector" on-invalid="null"/>
     </service>
     <service id="twig.extension.assets" class="Symfony\Bridge\Twig\Extension\AssetExtension">
       <tag name="twig.extension"/>
@@ -3835,6 +4687,10 @@
     <service id="twig.extension.weblink" class="Symfony\Bridge\Twig\Extension\WebLinkExtension">
       <argument type="service" id="request_stack"/>
     </service>
+    <service id="twig.translation.extractor" class="Symfony\Bridge\Twig\Translation\TwigExtractor">
+      <tag name="translation.extractor" alias="twig"/>
+      <argument type="service" id="twig"/>
+    </service>
     <service id="twig.configurator.environment" class="Symfony\Bundle\TwigBundle\DependencyInjection\Configurator\EnvironmentConfigurator">
       <argument>F j, Y H:i</argument>
       <argument>%d days</argument>
@@ -3867,7 +4723,7 @@
     </service>
     <service id="twig.extension.form" class="Symfony\Bridge\Twig\Extension\FormExtension">
       <tag name="twig.extension"/>
-      <argument>null</argument>
+      <argument type="service" id="translator.data_collector" on-invalid="null"/>
     </service>
     <service id="twig.form.engine" class="Symfony\Bridge\Twig\Form\TwigRendererEngine">
       <tag name="kernel.reset" method="reset"/>
@@ -4515,7 +5371,7 @@
       <argument type="abstract">options</argument>
       <argument type="service" id="property_accessor" on-invalid="null"/>
       <call method="setTranslator">
-        <argument type="service" id="translator" on-invalid="ignore"/>
+        <argument type="service" id="translator.data_collector" on-invalid="ignore"/>
       </call>
     </service>
     <service id="security.authenticator.x509" class="Symfony\Component\Security\Http\Authenticator\X509Authenticator" abstract="true">
@@ -5631,18 +6487,19 @@
       <argument type="service" id="service_container"/>
       <factory service=".service_locator.3QECKYg" method="withContext"/>
     </service>
-    <service id=".service_locator.KX_DHhr" class="Symfony\Component\DependencyInjection\ServiceLocator">
+    <service id=".service_locator.gTJiBsL" class="Symfony\Component\DependencyInjection\ServiceLocator">
       <tag name="container.service_locator"/>
       <argument type="collection">
         <argument key="todoRepository" type="service_closure" id="App\Repository\TodoRepository"/>
         <argument key="languageService" type="service_closure" id="App\Service\LanguageService"/>
+        <argument key="translator" type="service_closure" id="translator.data_collector"/>
       </argument>
     </service>
-    <service id=".service_locator.KX_DHhr.App\Controller\TodoListController::index()" class="Symfony\Component\DependencyInjection\ServiceLocator">
+    <service id=".service_locator.gTJiBsL.App\Controller\TodoListController::index()" class="Symfony\Component\DependencyInjection\ServiceLocator">
       <tag name="container.service_locator_context" id="App\Controller\TodoListController::index()"/>
       <argument>App\Controller\TodoListController::index()</argument>
       <argument type="service" id="service_container"/>
-      <factory service=".service_locator.KX_DHhr" method="withContext"/>
+      <factory service=".service_locator.gTJiBsL" method="withContext"/>
     </service>
     <service id=".service_locator.Kq27LHM" class="Symfony\Component\DependencyInjection\ServiceLocator">
       <tag name="container.service_locator"/>
@@ -5675,7 +6532,7 @@
       <argument type="service" id="service_container"/>
       <factory service=".service_locator.2Odv4WX" method="withContext"/>
     </service>
-    <service id=".service_locator.I4_FRn2" class="Symfony\Component\DependencyInjection\ServiceLocator">
+    <service id=".service_locator.btbRW75" class="Symfony\Component\DependencyInjection\ServiceLocator">
       <tag name="container.service_locator"/>
       <argument type="collection">
         <argument key="kernel::registerContainerConfiguration" type="service_closure" id=".service_locator.zHyJIs5.kernel::registerContainerConfiguration()"/>
@@ -5684,7 +6541,7 @@
         <argument key="App\Kernel::loadRoutes" type="service_closure" id=".service_locator.zHyJIs5.kernel::loadRoutes()"/>
         <argument key="App\Controller\RegistrationController::register" type="service_closure" id=".service_locator.KAWHxDW.App\Controller\RegistrationController::register()"/>
         <argument key="App\Controller\SecurityController::login" type="service_closure" id=".service_locator.3QECKYg.App\Controller\SecurityController::login()"/>
-        <argument key="App\Controller\TodoListController::index" type="service_closure" id=".service_locator.KX_DHhr.App\Controller\TodoListController::index()"/>
+        <argument key="App\Controller\TodoListController::index" type="service_closure" id=".service_locator.gTJiBsL.App\Controller\TodoListController::index()"/>
         <argument key="App\Controller\TodoListController::new" type="service_closure" id=".service_locator.Kq27LHM.App\Controller\TodoListController::new()"/>
         <argument key="App\Controller\TodoListController::edit" type="service_closure" id=".service_locator.2Odv4WX.App\Controller\TodoListController::edit()"/>
         <argument key="App\Controller\TodoListController::delete" type="service_closure" id=".service_locator.2Odv4WX.App\Controller\TodoListController::delete()"/>
@@ -5692,7 +6549,7 @@
         <argument key="kernel:loadRoutes" type="service_closure" id=".service_locator.zHyJIs5.kernel::loadRoutes()"/>
         <argument key="App\Controller\RegistrationController:register" type="service_closure" id=".service_locator.KAWHxDW.App\Controller\RegistrationController::register()"/>
         <argument key="App\Controller\SecurityController:login" type="service_closure" id=".service_locator.3QECKYg.App\Controller\SecurityController::login()"/>
-        <argument key="App\Controller\TodoListController:index" type="service_closure" id=".service_locator.KX_DHhr.App\Controller\TodoListController::index()"/>
+        <argument key="App\Controller\TodoListController:index" type="service_closure" id=".service_locator.gTJiBsL.App\Controller\TodoListController::index()"/>
         <argument key="App\Controller\TodoListController:new" type="service_closure" id=".service_locator.Kq27LHM.App\Controller\TodoListController::new()"/>
         <argument key="App\Controller\TodoListController:edit" type="service_closure" id=".service_locator.2Odv4WX.App\Controller\TodoListController::edit()"/>
         <argument key="App\Controller\TodoListController:delete" type="service_closure" id=".service_locator.2Odv4WX.App\Controller\TodoListController::delete()"/>
@@ -5876,6 +6733,22 @@
       <argument type="service" id="request_stack"/>
       <argument>%env(bool:default::key:web:default:kernel.runtime_mode:)%</argument>
     </service>
+    <service id=".service_locator.ILdUWIS" class="Symfony\Component\DependencyInjection\ServiceLocator">
+      <tag name="container.service_locator"/>
+      <argument type="collection">
+        <argument key="translation.loader.php" type="service_closure" id="translation.loader.php"/>
+        <argument key="translation.loader.yml" type="service_closure" id="translation.loader.yml"/>
+        <argument key="translation.loader.xliff" type="service_closure" id="translation.loader.xliff"/>
+        <argument key="translation.loader.po" type="service_closure" id="translation.loader.po"/>
+        <argument key="translation.loader.mo" type="service_closure" id="translation.loader.mo"/>
+        <argument key="translation.loader.qt" type="service_closure" id="translation.loader.qt"/>
+        <argument key="translation.loader.csv" type="service_closure" id="translation.loader.csv"/>
+        <argument key="translation.loader.res" type="service_closure" id="translation.loader.res"/>
+        <argument key="translation.loader.dat" type="service_closure" id="translation.loader.dat"/>
+        <argument key="translation.loader.ini" type="service_closure" id="translation.loader.ini"/>
+        <argument key="translation.loader.json" type="service_closure" id="translation.loader.json"/>
+      </argument>
+    </service>
     <service id=".service_locator.ZyP9f7K" class="Symfony\Component\DependencyInjection\ServiceLocator">
       <tag name="container.service_locator"/>
       <argument type="collection">
@@ -5919,6 +6792,18 @@
       <argument>App\Controller\TodoListController</argument>
       <argument type="service" id="service_container"/>
       <factory service=".service_locator.ZyP9f7K" method="withContext"/>
+    </service>
+    <service id=".service_locator.7jukgan" class="Symfony\Component\DependencyInjection\ServiceLocator">
+      <tag name="container.service_locator"/>
+      <argument type="collection">
+        <argument key="translator" type="service_closure" id="translator.data_collector"/>
+      </argument>
+    </service>
+    <service id=".service_locator.7jukgan.translation.warmer" class="Symfony\Component\DependencyInjection\ServiceLocator">
+      <tag name="container.service_locator_context" id="translation.warmer"/>
+      <argument>translation.warmer</argument>
+      <argument type="service" id="service_container"/>
+      <factory service=".service_locator.7jukgan" method="withContext"/>
     </service>
     <service id=".service_locator.RTjHFcp" class="Symfony\Component\DependencyInjection\ServiceLocator">
       <tag name="container.service_locator"/>
@@ -6249,6 +7134,20 @@
       <argument>false</argument>
       <argument type="service_closure" id="console.command.router_match"/>
     </service>
+    <service id=".console.command.translation_debug.lazy" class="Symfony\Component\Console\Command\LazyCommand">
+      <argument>debug:translation</argument>
+      <argument type="collection"/>
+      <argument>Display translation messages information</argument>
+      <argument>false</argument>
+      <argument type="service_closure" id="console.command.translation_debug"/>
+    </service>
+    <service id=".console.command.translation_extract.lazy" class="Symfony\Component\Console\Command\LazyCommand">
+      <argument>translation:extract</argument>
+      <argument type="collection"/>
+      <argument>Extract missing translations keys from code to translation files</argument>
+      <argument>false</argument>
+      <argument type="service_closure" id="console.command.translation_extract"/>
+    </service>
     <service id=".console.command.validator_debug.lazy" class="Symfony\Component\Console\Command\LazyCommand">
       <argument>debug:validator</argument>
       <argument type="collection"/>
@@ -6256,12 +7155,40 @@
       <argument>false</argument>
       <argument type="service_closure" id="console.command.validator_debug"/>
     </service>
+    <service id=".console.command.translation_pull.lazy" class="Symfony\Component\Console\Command\LazyCommand">
+      <argument>translation:pull</argument>
+      <argument type="collection"/>
+      <argument>Pull translations from a given provider.</argument>
+      <argument>false</argument>
+      <argument type="service_closure" id="console.command.translation_pull"/>
+    </service>
+    <service id=".console.command.translation_push.lazy" class="Symfony\Component\Console\Command\LazyCommand">
+      <argument>translation:push</argument>
+      <argument type="collection"/>
+      <argument>Push translations to a given provider.</argument>
+      <argument>false</argument>
+      <argument type="service_closure" id="console.command.translation_push"/>
+    </service>
+    <service id=".console.command.xliff_lint.lazy" class="Symfony\Component\Console\Command\LazyCommand">
+      <argument>lint:xliff</argument>
+      <argument type="collection"/>
+      <argument>Lint an XLIFF file and outputs encountered errors</argument>
+      <argument>false</argument>
+      <argument type="service_closure" id="console.command.xliff_lint"/>
+    </service>
     <service id=".console.command.yaml_lint.lazy" class="Symfony\Component\Console\Command\LazyCommand">
       <argument>lint:yaml</argument>
       <argument type="collection"/>
       <argument>Lint a YAML file and outputs encountered errors</argument>
       <argument>false</argument>
       <argument type="service_closure" id="console.command.yaml_lint"/>
+    </service>
+    <service id=".console.command.translation_lint.lazy" class="Symfony\Component\Console\Command\LazyCommand">
+      <argument>lint:translations</argument>
+      <argument type="collection"/>
+      <argument>Lint translations files syntax and outputs encountered errors</argument>
+      <argument>false</argument>
+      <argument type="service_closure" id="console.command.translation_lint"/>
     </service>
     <service id=".console.command.form_debug.lazy" class="Symfony\Component\Console\Command\LazyCommand">
       <argument>debug:form</argument>
@@ -6634,7 +7561,7 @@
     </service>
     <service id="console.command_loader" class="Symfony\Component\Console\CommandLoader\ContainerCommandLoader" public="true">
       <tag name="container.no_preload"/>
-      <argument type="service" id=".service_locator.zZ5AioQ"/>
+      <argument type="service" id=".service_locator..EUQ8n8"/>
       <argument type="collection">
         <argument key="about">console.command.about</argument>
         <argument key="assets:install">console.command.assets_install</argument>
@@ -6654,8 +7581,14 @@
         <argument key="debug:event-dispatcher">console.command.event_dispatcher_debug</argument>
         <argument key="debug:router">console.command.router_debug</argument>
         <argument key="router:match">console.command.router_match</argument>
+        <argument key="debug:translation">console.command.translation_debug</argument>
+        <argument key="translation:extract">console.command.translation_extract</argument>
         <argument key="debug:validator">console.command.validator_debug</argument>
+        <argument key="translation:pull">console.command.translation_pull</argument>
+        <argument key="translation:push">console.command.translation_push</argument>
+        <argument key="lint:xliff">console.command.xliff_lint</argument>
         <argument key="lint:yaml">console.command.yaml_lint</argument>
+        <argument key="lint:translations">console.command.translation_lint</argument>
         <argument key="debug:form">console.command.form_debug</argument>
         <argument key="secrets:set">console.command.secrets_set</argument>
         <argument key="secrets:remove">console.command.secrets_remove</argument>
@@ -6730,7 +7663,7 @@
         <argument key="make:webhook">maker.auto_command.make_webhook</argument>
       </argument>
     </service>
-    <service id=".service_locator.zZ5AioQ" class="Symfony\Component\DependencyInjection\ServiceLocator">
+    <service id=".service_locator..EUQ8n8" class="Symfony\Component\DependencyInjection\ServiceLocator">
       <tag name="container.service_locator"/>
       <argument type="collection">
         <argument key="console.command.about" type="service_closure" id=".console.command.about.lazy"/>
@@ -6751,8 +7684,14 @@
         <argument key="console.command.event_dispatcher_debug" type="service_closure" id=".console.command.event_dispatcher_debug.lazy"/>
         <argument key="console.command.router_debug" type="service_closure" id=".console.command.router_debug.lazy"/>
         <argument key="console.command.router_match" type="service_closure" id=".console.command.router_match.lazy"/>
+        <argument key="console.command.translation_debug" type="service_closure" id=".console.command.translation_debug.lazy"/>
+        <argument key="console.command.translation_extract" type="service_closure" id=".console.command.translation_extract.lazy"/>
         <argument key="console.command.validator_debug" type="service_closure" id=".console.command.validator_debug.lazy"/>
+        <argument key="console.command.translation_pull" type="service_closure" id=".console.command.translation_pull.lazy"/>
+        <argument key="console.command.translation_push" type="service_closure" id=".console.command.translation_push.lazy"/>
+        <argument key="console.command.xliff_lint" type="service_closure" id=".console.command.xliff_lint.lazy"/>
         <argument key="console.command.yaml_lint" type="service_closure" id=".console.command.yaml_lint.lazy"/>
+        <argument key="console.command.translation_lint" type="service_closure" id=".console.command.translation_lint.lazy"/>
         <argument key="console.command.form_debug" type="service_closure" id=".console.command.form_debug.lazy"/>
         <argument key="console.command.secrets_set" type="service_closure" id=".console.command.secrets_set.lazy"/>
         <argument key="console.command.secrets_remove" type="service_closure" id=".console.command.secrets_remove.lazy"/>
@@ -6951,8 +7890,16 @@
     <service id="Psr\Cache\CacheItemPoolInterface" alias="cache.app"/>
     <service id="Symfony\Contracts\Cache\CacheInterface" alias="cache.app"/>
     <service id="Symfony\Contracts\Cache\TagAwareCacheInterface" alias="cache.app.taggable"/>
+    <service id="Symfony\Contracts\Translation\TranslatorInterface" alias="translator.data_collector"/>
     <service id="Symfony\Component\Asset\Packages" alias="assets.packages"/>
     <service id="Symfony\Contracts\HttpClient\HttpClientInterface" alias=".debug.http_client"/>
+    <service id="Symfony\Component\Translation\Reader\TranslationReaderInterface" alias="translation.reader"/>
+    <service id="Symfony\Component\Translation\Extractor\ExtractorInterface" alias="translation.extractor"/>
+    <service id="Symfony\Component\Translation\Writer\TranslationWriterInterface" alias="translation.writer"/>
+    <service id="Symfony\Contracts\Translation\LocaleAwareInterface" alias="translation.locale_switcher"/>
+    <service id="Symfony\Component\Translation\LocaleSwitcher" alias="translation.locale_switcher"/>
+    <service id="translator" alias="translator.data_collector" public="true"/>
+    <service id="translator.formatter" alias="translator.formatter.default"/>
     <service id="Symfony\Component\ErrorHandler\ErrorRenderer\FileLinkFormatter" alias="debug.file_link_formatter"/>
     <service id="Symfony\Component\Stopwatch\Stopwatch" alias="debug.stopwatch"/>
     <service id="router" alias="router.default" public="true"/>
@@ -7028,7 +7975,7 @@
     <service id="Symfony\WebpackEncoreBundle\Asset\EntrypointLookupInterface" alias="webpack_encore.entrypoint_lookup[_default]"/>
     <service id="container.env_var_processors_locator" alias=".service_locator.pRu6x_4" public="true"/>
     <service id="twig.loader.filesystem" alias="twig.loader.native_filesystem"/>
-    <service id="argument_resolver.controller_locator" alias=".service_locator.I4_FRn2"/>
+    <service id="argument_resolver.controller_locator" alias=".service_locator.btbRW75"/>
     <service id="doctrine.id_generator_locator" alias=".service_locator.BxSdgVt"/>
     <service id="twig.loader" alias="twig.loader.native_filesystem"/>
     <service id="Psr\Log\LoggerInterface" alias="logger"/>
@@ -7041,6 +7988,7 @@
     <service id="controller_resolver" alias="debug.controller_resolver"/>
     <service id="argument_resolver" alias="debug.argument_resolver"/>
     <service id="security.csrf.token_manager" alias="security.csrf.same_origin_token_manager"/>
+    <service id="translator.data_collector.inner" alias="translator.default"/>
     <service id="twig.error_renderer.html.inner" alias="error_handler.error_renderer.html"/>
     <service id="security.access.decision_manager" alias="debug.security.access.decision_manager"/>
     <service id="security.firewall.authenticator.main" alias="debug.security.firewall.authenticator.main"/>
@@ -7049,7 +7997,7 @@
     <service id=".service_locator.n_ENPtW" alias=".service_locator.zHyJIs5"/>
     <service id=".service_locator.113K_6l" alias=".service_locator.KAWHxDW"/>
     <service id=".service_locator.Nrz07Zz" alias=".service_locator.3QECKYg"/>
-    <service id=".service_locator.VwdmG22" alias=".service_locator.KX_DHhr"/>
+    <service id=".service_locator.C47uPbT" alias=".service_locator.gTJiBsL"/>
     <service id=".service_locator.HQZddX8" alias=".service_locator.Kq27LHM"/>
     <service id=".service_locator.rppdLJp" alias=".service_locator.2Odv4WX"/>
     <service id=".service_locator.YoE4GGP" alias=".service_locator.ZyP9f7K"/>

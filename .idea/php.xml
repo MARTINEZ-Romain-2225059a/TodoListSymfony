@@ -223,6 +223,7 @@
       <path value="$PROJECT_DIR$/project_light/vendor/symfony/asset" />
       <path value="$PROJECT_DIR$/project_light/vendor/symfony/http-client-contracts" />
       <path value="$PROJECT_DIR$/project_light/vendor/symfony/http-client" />
+      <path value="$PROJECT_DIR$/project_light/vendor/symfony/translation" />
     </include_path>
   </component>
   <component name="PhpProjectSharedConfiguration" php_language_level="8.2" />

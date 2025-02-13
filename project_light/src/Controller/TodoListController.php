@@ -13,28 +13,44 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 #[IsGranted('ROLE_USER')]
 class TodoListController extends AbstractController
 {
     #[Route('/', name: 'app_todo', methods: ['GET'])]
-    public function index(TodoRepository $todoRepository, LanguageService $languageService, Request $request, SessionInterface $session): Response
-    {
+    public function index(
+        TodoRepository $todoRepository,
+        LanguageService $languageService,
+        Request $request,
+        SessionInterface $session,
+        TranslatorInterface $translator
+    ): Response {
         $languages = $languageService->getLanguages();
 
-        $currentLanguage = $session->get('lang', 15); // ID 15 = Français par défaut
+        // Récupérer l'ID de la langue (par défaut 15 = français)
+        $currentLanguageId = (int) $session->get('lang', 15);
 
+        // Si l'utilisateur change la langue via l'URL
         if ($request->query->get('lang')) {
-            $session->set('lang', $request->query->get('lang'));
-            $currentLanguage = $request->query->get('lang');
+            $currentLanguageId = (int) $request->query->get('lang');
+            $session->set('lang', $currentLanguageId);
         }
+
+        // Convertir l'ID en code de langue
+        $currentLanguageCode = $languageService->getCodeById($currentLanguageId);
+
+        // Appliquer la langue au Translator
+        $translator->setLocale($currentLanguageCode);
 
         return $this->render('todo_list/index.html.twig', [
             'todos' => $todoRepository->findAll(),
             'languages' => $languages,
-            'currentLanguage' => $currentLanguage,
+            'currentLanguage' => $currentLanguageId, // On garde l'ID pour la sélection
         ]);
     }
+
+
 
 
     #[Route('/new', name: 'app_todo_new', methods: ['GET', 'POST'])]
