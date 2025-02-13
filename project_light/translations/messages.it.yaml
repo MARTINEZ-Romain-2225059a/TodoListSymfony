@@ -1,0 +1,23 @@
+todo_list:
+  title: "📋 La Mia Lista delle Attività"
+  add_task: "➕ Aggiungi un'Attività"
+  logout: "🚪 Esci"
+  language: "🌍 Lingua"
+
+table:
+  name: "Nome"
+  start_date: "Data di inizio"
+  end_date: "Data di fine"
+  actions: "Azioni"
+  edit: "Modifica"
+  delete: "Elimina"
+  confirm_delete: "Sei sicuro di voler eliminare questa attività?"
+  no_tasks: "Nessuna attività disponibile."
+
+todo_edit:
+  title: "Modifica Attività"
+  task_name: "Nome dell'Attività"
+  start_date: "Data di inizio"
+  end_date: "Data di fine"
+  back_button: "Indietro"
+  save_button: "Salva"
