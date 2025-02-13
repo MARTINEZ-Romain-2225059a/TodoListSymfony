@@ -14,3 +14,8 @@ Pour que le projet fonctionne, il faut :
 - Faire la migration des deux bases de données.
 
 L'api doit avoir comme lien local : http://127.0.0.1:8001.
+
+De plus le site à un login et un register.
+Login pour tester : 
+- Id : test@gmail.com 
+- mdp : testtest
