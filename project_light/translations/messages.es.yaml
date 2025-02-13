@@ -1,0 +1,23 @@
+todo_list:
+  title: "📋 Mi Lista de Tareas"
+  add_task: "➕ Añadir una Tarea"
+  logout: "🚪 Cerrar sesión"
+  language: "🌍 Idioma"
+
+table:
+  name: "Nombre"
+  start_date: "Fecha de inicio"
+  end_date: "Fecha de fin"
+  actions: "Acciones"
+  edit: "Editar"
+  delete: "Eliminar"
+  confirm_delete: "¿Está seguro de que quiere eliminar esta tarea?"
+  no_tasks: "No hay tareas disponibles."
+
+todo_edit:
+  title: "Editar Tarea"
+  task_name: "Nombre de la Tarea"
+  start_date: "Fecha de inicio"
+  end_date: "Fecha de fin"
+  back_button: "Atrás"
+  save_button: "Guardar"

@@ -1652,6 +1652,7 @@
             <argument>/home/romain/Bureau/Symfony/TodoListSymfony/project_light/vendor/symfony/form/Resources/translations/validators.es.xlf</argument>
             <argument>/home/romain/Bureau/Symfony/TodoListSymfony/project_light/vendor/symfony/security-core/Resources/translations/security.es.xlf</argument>
             <argument>/home/romain/Bureau/Symfony/TodoListSymfony/project_light/vendor/symfonycasts/verify-email-bundle/src/Resources/translations/VerifyEmailBundle.es.xlf</argument>
+            <argument>/home/romain/Bureau/Symfony/TodoListSymfony/project_light/translations/messages.es.yaml</argument>
           </argument>
           <argument key="et" type="collection">
             <argument>/home/romain/Bureau/Symfony/TodoListSymfony/project_light/vendor/symfony/validator/Resources/translations/validators.et.xlf</argument>
@@ -1719,6 +1720,7 @@
             <argument>/home/romain/Bureau/Symfony/TodoListSymfony/project_light/vendor/symfony/form/Resources/translations/validators.it.xlf</argument>
             <argument>/home/romain/Bureau/Symfony/TodoListSymfony/project_light/vendor/symfony/security-core/Resources/translations/security.it.xlf</argument>
             <argument>/home/romain/Bureau/Symfony/TodoListSymfony/project_light/vendor/symfonycasts/verify-email-bundle/src/Resources/translations/VerifyEmailBundle.it.xlf</argument>
+            <argument>/home/romain/Bureau/Symfony/TodoListSymfony/project_light/translations/messages.it.yaml</argument>
           </argument>
           <argument key="ja" type="collection">
             <argument>/home/romain/Bureau/Symfony/TodoListSymfony/project_light/vendor/symfony/validator/Resources/translations/validators.ja.xlf</argument>
@@ -1888,6 +1890,12 @@
           </argument>
           <argument key="sr" type="collection">
             <argument>/home/romain/Bureau/Symfony/TodoListSymfony/project_light/vendor/symfonycasts/verify-email-bundle/src/Resources/translations/VerifyEmailBundle.sr.xlf</argument>
+          </argument>
+          <argument key="dk" type="collection">
+            <argument>/home/romain/Bureau/Symfony/TodoListSymfony/project_light/translations/messages.dk.yaml</argument>
+          </argument>
+          <argument key="jp" type="collection">
+            <argument>/home/romain/Bureau/Symfony/TodoListSymfony/project_light/translations/messages.jp.yaml</argument>
           </argument>
         </argument>
         <argument key="scanned_directories" type="collection">

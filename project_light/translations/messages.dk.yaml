@@ -1,0 +1,23 @@
+todo_list:
+  title: "📋 Min To-Do Liste"
+  add_task: "➕ Tilføj en Opgave"
+  logout: "🚪 Log ud"
+  language: "🌍 Sprog"
+
+table:
+  name: "Navn"
+  start_date: "Startdato"
+  end_date: "Slutdato"
+  actions: "Handlinger"
+  edit: "Rediger"
+  delete: "Slet"
+  confirm_delete: "Er du sikker på, at du vil slette denne opgave?"
+  no_tasks: "Ingen opgaver tilgængelige."
+
+todo_edit:
+  title: "Rediger Opgave"
+  task_name: "Opgavens Navn"
+  start_date: "Startdato"
+  end_date: "Slutdato"
+  back_button: "Tilbage"
+  save_button: "Gem"
